@@ -25,7 +25,7 @@ hero: /assets/images/hero-intro.png
 Install and scan in two commands — see [Installation](installation/) and [Run a scan](run-a-scan/).
 
 <p align="center">
-  <img src="/assets/casts/depfuse-package-express.gif" alt="Terminal demo: depfuse package express@4.17.1 --depth 2" width="100%" style="max-width:960px;border-radius:8px;">
+  <img src="{{ '/assets/casts/depfuse-package-express.gif' | relative_url }}" alt="Terminal demo: depfuse package express@4.17.1 --depth 2" width="100%" style="max-width:960px;border-radius:8px;">
 </p>
 
 ```bash

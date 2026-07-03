@@ -40,7 +40,7 @@ See [Run a scan](run-a-scan/) for detailed usage.
 Resolves the package **and its transitive npm dependency tree** from the registry. Nested findings appear in the main table with **Path** chains (e.g. `express → qs`). Use `--tree` to print the expanded shadow-dependency tree at the end.
 
 <p align="center">
-  <img src="/assets/casts/depfuse-package-express.gif" alt="Terminal demo: depfuse package express@4.17.1 --depth 2" width="100%" style="max-width:960px;border-radius:8px;">
+  <img src="{{ '/assets/casts/depfuse-package-express.gif' | relative_url }}" alt="Terminal demo: depfuse package express@4.17.1 --depth 2" width="100%" style="max-width:960px;border-radius:8px;">
 </p>
 
 <p class="caption" style="text-align:center;color:var(--fs-body-color-muted);font-size:0.9rem;margin-top:-0.5rem;">

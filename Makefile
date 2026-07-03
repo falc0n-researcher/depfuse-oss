@@ -81,7 +81,8 @@ demo-gif: build testdata
 		--idle-time-limit 1 --fps-cap 20 --last-frame-duration 4 \
 		docs/assets/casts/depfuse-package-express.cast \
 		docs/assets/casts/depfuse-package-express.gif
-	@echo "Demo GIF updated: docs/assets/casts/depfuse-package-express.gif"
+	cp docs/assets/casts/depfuse-package-express.gif assets/depfuse-package-express.gif
+	@echo "Demo GIF updated: docs/assets/casts/depfuse-package-express.gif and assets/depfuse-package-express.gif"
 
 clean:
 	rm -rf $(BIN_DIR)/ $(DIST_DIR)/ docs/_site docs/.jekyll-cache docs/.sass-cache

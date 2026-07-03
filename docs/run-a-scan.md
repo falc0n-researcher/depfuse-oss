@@ -92,7 +92,9 @@ Receipt tags: `[KEV]` `[Nuc]` `[MSF]` `[EDB]` `[PoC]` `[EPSS]` `[Exposure]`
 
 ### Terminal demo
 
-![Package scan demo](/assets/casts/depfuse-package-express.gif)
+<p align="center">
+  <img src="{{ '/assets/casts/depfuse-package-express.gif' | relative_url }}" alt="Package scan demo" width="100%" style="max-width:960px;border-radius:8px;">
+</p>
 
 ```bash
 depfuse package express@4.17.1 --depth 2

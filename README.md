@@ -25,7 +25,7 @@
 
 Scan a package from the npm registry — resolves transitive dependencies, matches CVEs, and returns **FIX NOW / FIX SOON / OK** verdicts with upgrade paths:
 
-![depfuse package scan — express@4.17.1](docs/assets/casts/depfuse-package-express.gif)
+![depfuse package scan — express@4.17.1](assets/depfuse-package-express.gif)
 
 ```bash
 depfuse package express@4.17.1 --depth 2
