@@ -59,7 +59,14 @@ Any change to `internal/classify/` must include an invariant test in `internal/c
 
 ## Documentation
 
-There are no separate docs beyond this README and CONTRIBUTING. Keep design decisions in PR descriptions or commit messages.
+Published at [falc0n-researcher.github.io/depfuse-oss](https://falc0n-researcher.github.io/depfuse-oss/). Source lives in `docs/` (Jekyll + Just the Docs).
+
+```bash
+make docs-serve   # local preview at http://127.0.0.1:4000
+make docs         # build to docs/_site/
+```
+
+Pages deploy automatically via `.github/workflows/jekyll-pages.yml` on push to `main`.
 
 ---
 

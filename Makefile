@@ -1,4 +1,4 @@
-.PHONY: all build install test test-golden testdata fmt lint vet clean release
+.PHONY: all build install test test-golden testdata fmt lint vet clean release docs docs-serve
 
 MODULE   := github.com/falc0n-researcher/depfuse-oss
 BINARY   := depfuse
@@ -47,8 +47,14 @@ lint: fmt vet
 vet:
 	$(GO) vet ./...
 
+docs:
+	cd docs && bundle install && bundle exec jekyll build
+
+docs-serve:
+	cd docs && bundle install && bundle exec jekyll serve --livereload --baseurl ""
+
 clean:
-	rm -rf $(BIN_DIR)/ $(DIST_DIR)/
+	rm -rf $(BIN_DIR)/ $(DIST_DIR)/ docs/_site docs/.jekyll-cache docs/.sass-cache
 
 release: clean
 	GOOS=darwin GOARCH=arm64 $(GO) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY)-darwin-arm64 $(CMD)

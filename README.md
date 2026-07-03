@@ -21,6 +21,8 @@ The tool answers three questions:
 
 Depfuse does **not** assess whether a CVE is reachable in your application's routes and code paths. It classifies dependency exposure by the strength of public exploit signals. App-context exploitability is planned for a future version.
 
+**Documentation:** [falc0n-researcher.github.io/depfuse-oss](https://falc0n-researcher.github.io/depfuse-oss/)
+
 ---
 
 ## Install
@@ -176,7 +178,7 @@ All CVE matches are classified into one of five levels based on the strength of 
 | Verdict | Condition |
 |---------|-----------|
 | **FIX NOW** | P0 or P1 in production dependencies |
-| **FIX SOON** | P2 or elevated watch band |
+| **FIX SOON** | P2; or P1 in dev-only dependencies |
 | **OK** | P3/P4, or P0/P1 scoped to dev-only dependencies |
 
 Every actionable verdict includes cited evidence receipts:

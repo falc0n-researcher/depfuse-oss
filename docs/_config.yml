@@ -1,0 +1,27 @@
+title: Depfuse Documentation
+description: Exploit-evidence decisions for npm dependency exposure.
+theme: just-the-docs
+
+url: https://falc0n-researcher.github.io
+baseurl: /depfuse-oss
+
+permalink: pretty
+heading_anchors: true
+search_enabled: true
+color_scheme: dark
+
+aux_links:
+  Depfuse on GitHub: //github.com/falc0n-researcher/depfuse-oss
+
+footer_content: "Copyright &copy; 2026 Depfuse contributors · MIT License"
+
+markdown: kramdown
+kramdown:
+  input: GFM
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - .sass-cache
+  - .jekyll-cache
