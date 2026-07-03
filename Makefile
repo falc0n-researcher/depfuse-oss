@@ -76,8 +76,9 @@ demo-gif: build testdata
 	@command -v agg >/dev/null || { echo "agg required: brew install agg"; exit 1; }
 	asciinema rec --overwrite --command './scripts/record-package-demo.sh' \
 		--title 'depfuse package express@4.17.1 --depth 2' --idle-time-limit 1 \
+		--window-size 140x48 \
 		docs/assets/casts/depfuse-package-express.cast
-	agg --theme dracula --cols 110 --rows 42 --font-size 13 --speed 1 \
+	agg --theme monokai --cols 140 --rows 48 --font-size 12 --speed 1 \
 		--idle-time-limit 1 --fps-cap 20 --last-frame-duration 4 \
 		docs/assets/casts/depfuse-package-express.cast \
 		docs/assets/casts/depfuse-package-express.gif

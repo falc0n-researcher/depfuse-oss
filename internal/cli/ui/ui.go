@@ -48,10 +48,13 @@ func envColumns() int {
 	return n
 }
 
-// Color enabled when output is a TTY and DEPFUSE_NO_COLOR is unset.
+// Color enabled when output is a TTY, DEPFUSE_COLOR=1 is set, or DEPFUSE_NO_COLOR is unset.
 func Color(w io.Writer) bool {
 	if os.Getenv("DEPFUSE_NO_COLOR") != "" {
 		return false
+	}
+	if os.Getenv("DEPFUSE_COLOR") == "1" {
+		return true
 	}
 	return IsTTY(w)
 }
