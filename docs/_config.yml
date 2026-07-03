@@ -1,23 +1,46 @@
 title: Depfuse Documentation
-description: Exploit-evidence decisions for npm dependency exposure.
+description: Exploit-evidence decisions for npm dependency exposure — FIX NOW / FIX SOON / OK verdicts with cited receipts.
 theme: just-the-docs
 
 url: https://falc0n-researcher.github.io
 baseurl: /depfuse-oss
 
 permalink: pretty
-heading_anchors: true
+
+# Just the Docs — navigation & search
+nav_sort: case_insensitive
+nav_external_links:
+  - title: GitHub
+    url: https://github.com/falc0n-researcher/depfuse-oss
+    hide_icon: false
+
 search_enabled: true
-color_scheme: dark
+search:
+  heading_level: 2
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  tokenizer_separator: /[\s\-/]+/
+  rel_url: true
+
+heading_anchors: true
+back_to_top: true
+back_to_top_text: "Back to top"
 
 aux_links:
   Depfuse on GitHub: //github.com/falc0n-researcher/depfuse-oss
 
-footer_content: "Copyright &copy; 2026 Depfuse contributors · MIT License"
+footer_content: "Copyright &copy; 2026 Depfuse contributors · <a href=\"https://github.com/falc0n-researcher/depfuse-oss/blob/main/LICENSE\">MIT License</a>"
+
+# Light theme with Depfuse orange accent (via _sass/custom/setup.scss)
+color_scheme: light
 
 markdown: kramdown
 kramdown:
   input: GFM
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
 
 exclude:
   - Gemfile
@@ -25,3 +48,4 @@ exclude:
   - vendor
   - .sass-cache
   - .jekyll-cache
+  - _site

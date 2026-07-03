@@ -1,0 +1,58 @@
+.site-header {
+  border-bottom: 2px solid #ff6b2c;
+}
+
+blockquote {
+  border-left: 4px solid #ff6b2c;
+  background: rgba(255, 107, 44, 0.08);
+  border-radius: 0 6px 6px 0;
+}
+
+.main-content h1,
+.main-content h2 {
+  border-bottom: 1px solid rgba(255, 107, 44, 0.2);
+  padding-bottom: 0.35em;
+}
+
+.page-hero {
+  margin: 0 0 1.75rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 107, 44, 0.2);
+  box-shadow: 0 4px 24px rgba(255, 107, 44, 0.08);
+}
+
+.page-hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+  object-fit: cover;
+}
+
+.lead {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #3d3d3d;
+  margin-bottom: 1.5rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.doc-card {
+  border: 1px solid rgba(255, 107, 44, 0.2);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  background: rgba(255, 107, 44, 0.04);
+}
+
+.doc-card strong {
+  color: #ff6b2c;
+  display: block;
+  margin-bottom: 0.35rem;
+}

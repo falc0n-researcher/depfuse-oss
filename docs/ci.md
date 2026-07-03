@@ -3,7 +3,16 @@ title: CI integration
 layout: default
 nav_order: 10
 permalink: /ci/
+hero: /assets/images/hero-ci.png
 ---
+
+<p class="lead">Gate pull requests and releases on exploit evidence, not CVSS noise. Use <code>--ci --fail-on</code> to fail the pipeline when weaponized CVEs appear in production dependencies.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>--ci</strong> Pipeline-friendly output without interactive formatting.</div>
+  <div class="doc-card"><strong>--fail-on</strong> Choose which tiers (P0–P2) fail the job.</div>
+  <div class="doc-card"><strong>SARIF export</strong> Integrate with GitHub Advanced Security tooling.</div>
+</div>
 
 ## Basic CI scan
 

@@ -3,9 +3,16 @@ title: Introduction
 layout: default
 nav_order: 1
 permalink: /
+hero: /assets/images/hero-intro.png
 ---
 
-**Depfuse** is an open-source CLI that scans npm dependency exposure and classifies CVE matches by **public exploit evidence**. Instead of sorted vulnerability lists with risk scores, it produces **FIX NOW / FIX SOON / OK** verdicts with cited evidence receipts.
+<p class="lead"><strong>Depfuse</strong> scans npm dependency exposure and classifies CVE matches by <strong>public exploit evidence</strong>. Instead of sorted vulnerability lists with risk scores, it produces <strong>FIX NOW / FIX SOON / OK</strong> verdicts with cited evidence receipts.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>Actionable verdicts</strong> FIX NOW, FIX SOON, or OK — not another CVE dashboard.</div>
+  <div class="doc-card"><strong>Cited receipts</strong> Every finding links to KEV, Nuclei, Metasploit, PoC, and EPSS signals.</div>
+  <div class="doc-card"><strong>Deterministic</strong> Code-driven classification — no LLM scoring or CVSS weighting.</div>
+</div>
 
 ## Who is this for?
 

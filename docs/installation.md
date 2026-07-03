@@ -3,7 +3,16 @@ title: Installation
 layout: default
 nav_order: 2
 permalink: /installation/
+hero: /assets/images/hero-install.png
 ---
+
+<p class="lead">Install the Depfuse CLI with <code>go install</code> or build from source. A first scan works offline using the embedded advisory snapshot; run <code>depfuse collect</code> for full OSV coverage and fresh intelligence feeds.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>Go 1.25+</strong> Required for building from source.</div>
+  <div class="doc-card"><strong>Offline-ready</strong> Embedded weaponized snapshot ships with the binary.</div>
+  <div class="doc-card"><strong>Full index</strong> <code>depfuse collect</code> builds <code>~/.depfuse/intel.db</code>.</div>
+</div>
 
 ## Requirements
 

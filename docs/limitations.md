@@ -3,9 +3,16 @@ title: Limitations
 layout: default
 nav_order: 9
 permalink: /limitations/
+hero: /assets/images/hero-limitations.png
 ---
 
-Depfuse is explicit about what it does and does not claim.
+<p class="lead">Depfuse is explicit about what it does and does not claim. Understanding these boundaries helps you interpret scan results correctly and avoid false confidence.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>Not reachability</strong> Classifies dependency exposure, not app code paths.</div>
+  <div class="doc-card"><strong>Embedded snapshot</strong> Offline scans miss P4 hygiene CVEs until collect.</div>
+  <div class="doc-card"><strong>Known gaps</strong> XDB tier wiring, flat yarn/pnpm paths, peer deps.</div>
+</div>
 
 ## Scope boundaries
 

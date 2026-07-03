@@ -1,4 +1,4 @@
-.PHONY: all build install test test-golden testdata fmt lint vet clean release docs docs-serve
+.PHONY: all build install test test-golden testdata fmt lint vet clean release docs docs-serve docs-clean-cache
 
 MODULE   := github.com/falc0n-researcher/depfuse-oss
 BINARY   := depfuse
@@ -48,10 +48,15 @@ vet:
 	$(GO) vet ./...
 
 docs:
-	cd docs && bundle install && bundle exec jekyll build
+	cd docs && (bundle check >/dev/null 2>&1 || bundle install)
+	cd docs && bundle exec jekyll build
 
-docs-serve:
-	cd docs && bundle install && bundle exec jekyll serve --livereload --baseurl ""
+docs-serve: docs-clean-cache
+	cd docs && (bundle check >/dev/null 2>&1 || bundle install)
+	cd docs && bundle exec jekyll serve --livereload --baseurl ""
+
+docs-clean-cache:
+	rm -rf docs/.jekyll-cache docs/_site
 
 clean:
 	rm -rf $(BIN_DIR)/ $(DIST_DIR)/ docs/_site docs/.jekyll-cache docs/.sass-cache

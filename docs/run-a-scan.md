@@ -3,7 +3,16 @@ title: Run a scan
 layout: default
 nav_order: 3
 permalink: /run-a-scan/
+hero: /assets/images/hero-scan.png
 ---
+
+<p class="lead">Point Depfuse at a local project directory or GitHub URL. It walks lockfiles, matches pinned versions against OSV, and returns verdicts with evidence receipts — in the terminal, JSON, SARIF, or HTML.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>Local or remote</strong> Scan <code>.</code>, a path, or a GitHub repo URL.</div>
+  <div class="doc-card"><strong>Multiple formats</strong> CLI, JSON, SARIF, and HTML report output.</div>
+  <div class="doc-card"><strong>CI-ready</strong> Use <code>--ci --fail-on P0,P1</code> to gate pipelines.</div>
+</div>
 
 ## Local project
 

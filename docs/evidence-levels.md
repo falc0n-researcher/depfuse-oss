@@ -3,7 +3,16 @@ title: Evidence levels
 layout: default
 nav_order: 6
 permalink: /evidence-levels/
+hero: /assets/images/hero-evidence.png
 ---
+
+<p class="lead">Depfuse maps public exploit signals to a five-tier priority ladder (<strong>P0–P4</strong>), then applies scope-aware verdict rules. CVSS is never used as an exploit signal.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>P0–P2</strong> Active exploitation through available exploit tooling.</div>
+  <div class="doc-card"><strong>P3</strong> OSV match with elevated EPSS, no exploit signal.</div>
+  <div class="doc-card"><strong>P4</strong> Hygiene — advisory exists, no public exploit evidence.</div>
+</div>
 
 ## Priority ladder
 

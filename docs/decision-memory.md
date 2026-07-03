@@ -3,9 +3,16 @@ title: Decision memory
 layout: default
 nav_order: 11
 permalink: /decision-memory/
+hero: /assets/images/hero-decisions.png
 ---
 
-Record accepted-risk findings and get alerted when exploit evidence changes.
+<p class="lead">Record accepted-risk findings and get alerted when exploit evidence changes. Decisions suppress repeat noise until reopen conditions fire — keeping your backlog honest over time.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>Record</strong> Document why a finding was accepted with context.</div>
+  <div class="doc-card"><strong>Watch</strong> Surface decisions when KEV, tier, or EPSS changes.</div>
+  <div class="doc-card"><strong>Reopen</strong> Automatic triggers at EPSS ≥ 0.90 or tier escalation.</div>
+</div>
 
 ## Recording decisions
 

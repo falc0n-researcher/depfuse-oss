@@ -3,9 +3,16 @@ title: Intelligence sources
 layout: default
 nav_order: 7
 permalink: /intelligence-sources/
+hero: /assets/images/hero-feeds.png
 ---
 
-All feeds store **metadata only** — no exploit code or PoC files are downloaded or executed.
+<p class="lead">Depfuse ingests metadata from public exploit-intelligence feeds during <code>depfuse collect</code>. No exploit code or PoC files are downloaded or executed — only classification signals.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>Authoritative</strong> VulnCheck KEV drives P0 (actively exploited).</div>
+  <div class="doc-card"><strong>Weaponized</strong> Nuclei, Metasploit, and verified PoCs → P1.</div>
+  <div class="doc-card"><strong>Watch band</strong> EPSS ≥ 0.05 elevates to P3 when no exploit signal exists.</div>
+</div>
 
 ## Feed registry
 

@@ -3,9 +3,16 @@ title: Methodology
 layout: default
 nav_order: 5
 permalink: /methodology/
+hero: /assets/images/hero-methodology.png
 ---
 
-Depfuse implements a **deterministic exploit-evidence pipeline**. Every verdict is code-driven — no LLM classification, no CVSS-weighted risk scores.
+<p class="lead">Depfuse implements a <strong>deterministic exploit-evidence pipeline</strong>. Every verdict is code-driven — no LLM classification, no CVSS-weighted risk scores.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>Resolve → Match</strong> Enumerate pinned deps, query OSV for each version.</div>
+  <div class="doc-card"><strong>Classify → Verdict</strong> Map feeds to P0–P4, apply scope-aware rules.</div>
+  <div class="doc-card"><strong>Filter → Emit</strong> Honor ignore files and decisions, output receipts.</div>
+</div>
 
 ## Pipeline stages
 

@@ -74,12 +74,13 @@ depfuse-repos/
 /reports/
 /tmp/
 
-# ── Documentation (Jekyll) ────────────────────────────────────────────────────
+# ── Documentation (Jekyll / Just the Docs) ───────────────────────────────────
 docs/_site/
 docs/.jekyll-cache/
 docs/.sass-cache/
 docs/vendor/
 /site/
+.venv-docs/
 
 # ── Release tooling ───────────────────────────────────────────────────────────
 .goreleaser.yaml.bak

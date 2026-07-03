@@ -3,7 +3,16 @@ title: Commands
 layout: default
 nav_order: 4
 permalink: /commands/
+hero: /assets/images/hero-scan.png
 ---
+
+<p class="lead">Depfuse exposes a small CLI surface: scan projects, look up packages and CVEs, collect intelligence feeds, and track accepted-risk decisions over time.</p>
+
+<div class="card-grid">
+  <div class="doc-card"><strong>scan</strong> Full project or GitHub repo dependency scan.</div>
+  <div class="doc-card"><strong>package / cve</strong> Targeted lookups with evidence receipts.</div>
+  <div class="doc-card"><strong>collect / watch</strong> Refresh feeds and surface stale decisions.</div>
+</div>
 
 ## Primary commands
 
