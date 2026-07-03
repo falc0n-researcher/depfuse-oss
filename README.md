@@ -21,6 +21,18 @@
 
 > Depfuse classifies **dependency exposure + public exploit signals**. It does not do reachability analysis (yet). [Read the scope →](https://falc0n-researcher.github.io/depfuse-oss/limitations/)
 
+## Demo
+
+Scan a package from the npm registry — resolves transitive dependencies, matches CVEs, and returns **FIX NOW / FIX SOON / OK** verdicts with upgrade paths:
+
+![depfuse package scan — express@4.17.1](docs/assets/casts/depfuse-package-express.gif)
+
+```bash
+depfuse package express@4.17.1 --depth 2
+```
+
+→ [Full HTML package report](samples/package.html) · [More commands](https://falc0n-researcher.github.io/depfuse-oss/commands/)
+
 ## Install
 
 ```bash

@@ -37,11 +37,27 @@ See [Run a scan](run-a-scan/) for detailed usage.
 
 ## `depfuse package`
 
+Resolves the package **and its transitive npm dependency tree** from the registry. Nested findings appear in the main table with **Path** chains (e.g. `express → qs`). Use `--tree` to print the expanded shadow-dependency tree at the end.
+
+<p align="center">
+  <img src="/assets/casts/depfuse-package-express.gif" alt="Terminal demo: depfuse package express@4.17.1 --depth 2" width="100%" style="max-width:960px;border-radius:8px;">
+</p>
+
+<p class="caption" style="text-align:center;color:var(--fs-body-color-muted);font-size:0.9rem;margin-top:-0.5rem;">
+  <code>depfuse package express@4.17.1 --depth 2</code> — 47 packages resolved, 12 CVE matches classified
+</p>
+
 ```bash
 depfuse package next@15.1.0
+depfuse package express@4.17.1              # 50+ transitive packages
+depfuse package express@4.17.1 --tree       # expanded dependency tree
+depfuse package express@4.17.1 --depth 1    # direct package only
 depfuse package lodash@4.17.20 --verbose
 depfuse package next@15.1.0 --format html --out-dir ./reports
 ```
+
+> **Note**  
+> `--tree` on `package` is optional — transitive CVEs and install paths are already shown in the findings table. On `depfuse scan`, `--tree` expands the lockfile dependency tree instead.
 
 ## `depfuse cve`
 

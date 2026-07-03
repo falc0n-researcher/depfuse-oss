@@ -1,4 +1,4 @@
-.PHONY: all build install test test-golden testdata fmt lint vet clean release docs docs-serve docs-clean-cache
+.PHONY: all build install test test-golden testdata fmt lint vet clean release docs docs-serve docs-clean-cache samples demo-gif
 
 MODULE   := github.com/falc0n-researcher/depfuse-oss
 BINARY   := depfuse
@@ -57,6 +57,31 @@ docs-serve: docs-clean-cache
 
 docs-clean-cache:
 	rm -rf docs/.jekyll-cache docs/_site
+
+samples: build testdata
+	DEPFUSE_OFFLINE=1 DEPFUSE_SKIP_AUTO_COLLECT=1 DEPFUSE_INTEL_DB=./testdata/intel.db \
+		./bin/depfuse scan demo_package/ --format html --out-dir samples --quiet
+	mv samples/report.html samples/scan.html
+	DEPFUSE_OFFLINE=1 DEPFUSE_SKIP_AUTO_COLLECT=1 DEPFUSE_INTEL_DB=./testdata/intel.db \
+		./bin/depfuse package next@15.1.0 --format html --out-dir samples --quiet
+	mv samples/report-package.html samples/package.html
+	DEPFUSE_OFFLINE=1 DEPFUSE_SKIP_AUTO_COLLECT=1 DEPFUSE_INTEL_DB=./testdata/intel.db \
+		./bin/depfuse cve CVE-2025-29927 --format html --out-dir samples --quiet
+	mv samples/report-cve.html samples/cve.html
+	@rm -f samples/report.md samples/report-package.md samples/report-cve.md
+	@echo "Samples updated in samples/"
+
+demo-gif: build testdata
+	@command -v asciinema >/dev/null || { echo "asciinema required: brew install asciinema"; exit 1; }
+	@command -v agg >/dev/null || { echo "agg required: brew install agg"; exit 1; }
+	asciinema rec --overwrite --command './scripts/record-package-demo.sh' \
+		--title 'depfuse package express@4.17.1 --depth 2' --idle-time-limit 1 \
+		docs/assets/casts/depfuse-package-express.cast
+	agg --theme dracula --cols 110 --rows 42 --font-size 13 --speed 1 \
+		--idle-time-limit 1 --fps-cap 20 --last-frame-duration 4 \
+		docs/assets/casts/depfuse-package-express.cast \
+		docs/assets/casts/depfuse-package-express.gif
+	@echo "Demo GIF updated: docs/assets/casts/depfuse-package-express.gif"
 
 clean:
 	rm -rf $(BIN_DIR)/ $(DIST_DIR)/ docs/_site docs/.jekyll-cache docs/.sass-cache

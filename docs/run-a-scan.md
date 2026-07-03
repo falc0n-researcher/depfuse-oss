@@ -34,7 +34,7 @@ The repository is cloned to a temporary directory, scanned, and cleaned up.
 ## Common flags
 
 ```bash
-# Full transitive dependency tree in output
+# Expand the lockfile dependency tree at the end of CLI output (scan only)
 depfuse scan . --tree
 
 # Output formats
@@ -48,6 +48,9 @@ depfuse scan . --out-dir ./reports
 # CI mode — suppress interactive output, explicit fail condition
 depfuse scan . --ci --fail-on P0,P1
 ```
+
+> **Note — Nested dependencies**  
+> `depfuse scan` resolves your lockfile graph; use `--tree` to print it expanded. For a single package lookup with registry transitivity, use [`depfuse package`](commands/#depfuse-package) — nested paths (e.g. `express → qs`) appear in the findings table by default.
 
 ## No lockfile?
 
@@ -86,6 +89,16 @@ Receipt tags: `[KEV]` `[Nuc]` `[MSF]` `[EDB]` `[PoC]` `[EPSS]` `[Exposure]`
 * [Scan report](https://github.com/falc0n-researcher/depfuse-oss/blob/main/samples/scan.html)
 * [Package report](https://github.com/falc0n-researcher/depfuse-oss/blob/main/samples/package.html)
 * [CVE report](https://github.com/falc0n-researcher/depfuse-oss/blob/main/samples/cve.html)
+
+### Terminal demo
+
+![Package scan demo](/assets/casts/depfuse-package-express.gif)
+
+```bash
+depfuse package express@4.17.1 --depth 2
+```
+
+Regenerate the GIF with `make demo-gif` (requires [agg](https://github.com/asciinema/agg) and seeded `testdata/intel.db`).
 
 ## Next steps
 
