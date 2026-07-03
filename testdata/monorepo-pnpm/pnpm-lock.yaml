@@ -1,0 +1,6 @@
+lockfileVersion: '6.0'
+
+packages:
+  /lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57cuTQF0iHBIGXYq8o3Y/4TzkHFIr8VAE4P8Xf7W7K1XQdV0Jz3Q7X7X7X7X7X7X7X7X7X7X7X7X7X7X7X7X7X=}
+    engines: {node: '>=0.10.0'}

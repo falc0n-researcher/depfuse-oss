@@ -1,0 +1,7 @@
+{
+  "name": "next-app",
+  "private": true,
+  "dependencies": {
+    "next": "15.1.0"
+  }
+}

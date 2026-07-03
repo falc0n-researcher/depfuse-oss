@@ -1,0 +1,14 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Go source
+*.go text diff=golang
+
+# Shell scripts must stay executable
+*.sh text eol=lf
+
+# Binary fixtures
+*.db binary
+
+# Denote generated files (linguist)
+go.sum linguist-generated

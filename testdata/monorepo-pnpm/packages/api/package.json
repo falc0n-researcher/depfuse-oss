@@ -1,0 +1,6 @@
+{
+  "name": "@monorepo-pnpm/api",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}

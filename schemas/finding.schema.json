@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Finding",
+  "type": "object",
+  "required": ["component", "cve", "classification", "verdict"],
+  "properties": {
+    "component": {
+      "type": "object",
+      "required": ["name", "version", "purl", "scope", "direct"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "purl": { "type": "string" },
+        "scope": { "enum": ["prod", "dev"] },
+        "direct": { "type": "boolean" },
+        "path": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Dependency chain from direct deps to this package"
+        },
+        "manifest": { "type": "string" },
+        "lockfileRoot": { "type": "string" }
+      }
+    },
+    "cve": {
+      "type": "object",
+      "required": ["cveId"],
+      "properties": {
+        "cveId": { "type": "string" },
+        "ghsaId": { "type": "string" },
+        "osvId": { "type": "string" },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "summary": { "type": "string" },
+        "fixedVersions": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "required": ["priority", "confidence"],
+      "properties": {
+        "priority": { "type": "string", "enum": ["P0", "P1", "P2", "P3", "P4"], "description": "Exploitability priority (P0=most severe)" },
+        "confidence": { "type": "number" },
+        "confidenceBand": { "enum": ["High", "Medium", "Low"] }
+      }
+    },
+    "verdict": { "enum": ["FIX NOW", "FIX SOON", "OK", "PATCH NOW", "PATCH SOON", "WATCH"] },
+    "verdictReason": { "type": "string" },
+    "briefing": { "type": "string" },
+    "exposureNote": { "type": "string" },
+    "suppressed": { "type": "boolean" },
+    "suppressionReason": { "type": "string" }
+  }
+}
