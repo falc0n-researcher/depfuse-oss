@@ -23,7 +23,7 @@ func Lookup(ctx context.Context, store *intel.Store, offline bool, names ...stri
 	for _, name := range uniq {
 		if cached, ok, _ := store.GetPackageMeta(name); ok {
 			fresh := !cached.FetchedAt.IsZero() && time.Since(cached.FetchedAt) <= cacheTTL
-			useful := cached.Context != nil && (cached.Context.WeeklyDownloads > 0 || strings.TrimSpace(cached.Context.Description) != "")
+			useful := cached.Context != nil && (cached.Context.WeeklyDownloads > 0 || strings.TrimSpace(cached.Context.Description) != "" || strings.TrimSpace(cached.Context.License) != "" || strings.TrimSpace(cached.Context.Homepage) != "")
 			if fresh && useful {
 				out[name] = cached.Context
 				continue
@@ -62,7 +62,7 @@ func Lookup(ctx context.Context, store *intel.Store, offline bool, names ...stri
 			WeeklyDownloads: weekly,
 			Popularity:      PopularityFromWeeklyDownloads(weekly),
 		}
-		if weekly == 0 && strings.TrimSpace(desc) == "" {
+		if weekly == 0 && strings.TrimSpace(desc) == "" && strings.TrimSpace(license) == "" && strings.TrimSpace(homepage) == "" {
 			continue
 		}
 		out[name] = ctxMeta

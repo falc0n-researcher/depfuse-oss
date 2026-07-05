@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 
 	"github.com/falc0n-researcher/depfuse-oss/internal/intel"
 	"github.com/falc0n-researcher/depfuse-oss/internal/match"
+	"github.com/falc0n-researcher/depfuse-oss/internal/pkgmeta"
 	"github.com/falc0n-researcher/depfuse-oss/internal/resolve"
+	"github.com/falc0n-researcher/depfuse-oss/pkg/models"
 )
 
 // DemoFixtureRoot is the primary offline demo and CFP scan target.
@@ -58,7 +61,10 @@ func SeedIntelDB(dbPath string, fixtureRoots ...string) error {
 			}
 		}
 	}
-	return intel.SyncAliasesFromOSVCache(store)
+	if err := intel.SyncAliasesFromOSVCache(store); err != nil {
+		return err
+	}
+	return seedPackageMeta(context.Background(), store, fixtureRoots)
 }
 
 // DefaultPaths returns standard testdata locations relative to repo root.
@@ -95,4 +101,43 @@ func EnsureDemoIntelDB(repoRoot string) error {
 		return err
 	}
 	return SeedIntelDB(dbPath, fixtureRoot)
+}
+
+// seedPackageMeta caches npm registry metadata for fixture components and common
+// package-mode lookup trees so offline HTML reports include ecosystem context.
+func seedPackageMeta(ctx context.Context, store *intel.Store, fixtureRoots []string) error {
+	names := map[string]struct{}{}
+	addComps := func(comps []models.Component) {
+		for _, c := range comps {
+			if c.Name != "" && !c.Unresolved {
+				names[c.Name] = struct{}{}
+			}
+		}
+	}
+	for _, root := range fixtureRoots {
+		comps, err := resolve.Resolve(resolve.Options{Root: root, Ctx: ctx})
+		if err != nil {
+			return fmt.Errorf("resolve %s for package meta: %w", root, err)
+		}
+		addComps(comps)
+	}
+	for _, pkg := range []string{"next@15.1.0", "express@4.17.1", "jquery@3.2.1"} {
+		comps, _, err := resolve.ResolvePackageTree(ctx, pkg, resolve.TreeOptions{})
+		if err != nil {
+			return fmt.Errorf("resolve tree %s for package meta: %w", pkg, err)
+		}
+		addComps(comps)
+	}
+	if len(names) == 0 {
+		return nil
+	}
+	list := make([]string, 0, len(names))
+	for name := range names {
+		list = append(list, name)
+	}
+	sort.Strings(list)
+	if _, err := pkgmeta.Lookup(ctx, store, false, list...); err != nil {
+		return fmt.Errorf("lookup package meta: %w", err)
+	}
+	return nil
 }

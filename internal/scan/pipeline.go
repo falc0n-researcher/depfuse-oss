@@ -108,7 +108,7 @@ func (r *Runner) Run(ctx context.Context, opts Options) (models.ScanResult, int,
 			alwaysPkg = []string{components[0].Name}
 		}
 	}
-	pkgMap := attachPackageContext(ctx, store, opts.Offline, findings, opts.Verbose, alwaysPkg...)
+	pkgMap := attachPackageContext(ctx, store, opts.Offline, findings, components, alwaysPkg...)
 	done(fmt.Sprintf("%d packages", len(pkgMap)))
 
 	rules, _ := ignore.Load(root)

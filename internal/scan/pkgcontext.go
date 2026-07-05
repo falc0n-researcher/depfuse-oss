@@ -9,15 +9,18 @@ import (
 	"github.com/falc0n-researcher/depfuse-oss/pkg/models"
 )
 
-func attachPackageContext(ctx context.Context, store *intel.Store, offline bool, findings []models.Finding, verbose bool, alwaysInclude ...string) map[string]models.PackageContext {
-	names := packageNamesForContext(findings, verbose)
+func attachPackageContext(ctx context.Context, store *intel.Store, offline bool, findings []models.Finding, components []models.Component, alwaysInclude ...string) map[string]models.PackageContext {
+	names := packageNamesForContext(findings, components)
 	names = append(names, alwaysInclude...)
 	if len(names) == 0 {
 		return nil
 	}
 
 	lookup, err := pkgmeta.Lookup(ctx, store, offline, names...)
-	if err != nil || len(lookup) == 0 {
+	if err != nil {
+		return nil
+	}
+	if len(lookup) == 0 {
 		return nil
 	}
 
@@ -42,22 +45,24 @@ func attachPackageContext(ctx context.Context, store *intel.Store, offline bool,
 	return out
 }
 
-func packageNamesForContext(findings []models.Finding, verbose bool) []string {
+func packageNamesForContext(findings []models.Finding, components []models.Component) []string {
 	seen := map[string]bool{}
 	var names []string
+	add := func(name string) {
+		if name == "" || seen[name] {
+			return
+		}
+		seen[name] = true
+		names = append(names, name)
+	}
 	for _, f := range findings {
-		if f.Component.Name == "" || f.Component.Unresolved {
+		if f.Component.Unresolved {
 			continue
 		}
-		// Enrich action findings and direct dependencies for report ecosystem context.
-		if !verbose && !f.Verdict.IsAction() && !f.Component.Direct {
-			continue
-		}
-		if seen[f.Component.Name] {
-			continue
-		}
-		seen[f.Component.Name] = true
-		names = append(names, f.Component.Name)
+		add(f.Component.Name)
+	}
+	for _, c := range components {
+		add(c.Name)
 	}
 	return names
 }

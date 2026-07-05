@@ -82,6 +82,7 @@ func writeFindingCard(b *strings.Builder, f models.Finding, packages map[string]
 	fmt.Fprintf(b, `<div class="finding-pkg-line"><strong>%s</strong>@<strong>%s</strong> · %s</div>`,
 		esc(f.Component.Name), esc(f.Component.Version), esc(dependencyRoleLabel(f.Component)))
 	b.WriteString(pathLine)
+	writeFindingEcoStrip(b, f, packages)
 	fmt.Fprintf(b, `</div><span class="verdict-pill verdict-%s">%s</span></div>`, verdictClass(f.Verdict), esc(string(f.Verdict)))
 
 	b.WriteString(`<div class="finding-body">`)

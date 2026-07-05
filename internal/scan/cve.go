@@ -121,7 +121,7 @@ func (r *Runner) enrichCVEResult(ctx context.Context, store *intel.Store, opts O
 		}
 	}
 
-	pkgMap := attachPackageContext(ctx, store, opts.Offline, findings, true, names...)
+	pkgMap := attachPackageContext(ctx, store, opts.Offline, findings, components, names...)
 	return components, pkgMap, treeStats
 }
 

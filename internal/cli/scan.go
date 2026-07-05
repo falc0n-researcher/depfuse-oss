@@ -112,6 +112,7 @@ func newPackageCmd(flags *globalFlags) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts := flags.baseOpts()
 			opts.OutDir = local.OutDir
+			opts.ShowTree = local.ShowTree
 			applyTreeFlags(&opts, treeLocal)
 			opts.Package = args[0]
 			runner := &scan.Runner{}
@@ -128,6 +129,7 @@ func newPackageCmd(flags *globalFlags) *cobra.Command {
 			return runScan(cmd.Context(), opts)
 		},
 	}
+	cmd.Flags().BoolVar(&local.ShowTree, "tree", false, "Expand full nested shadow dependency tree in output")
 	bindReportFlags(cmd, &local)
 	bindTreeFlags(cmd, &treeLocal)
 	return cmd

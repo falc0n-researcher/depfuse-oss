@@ -80,3 +80,69 @@ func TestRenderHTMLWriter(t *testing.T) {
 	require.NoError(t, report.RenderHTMLWriter(&b, result))
 	require.Contains(t, b.String(), "<!DOCTYPE html>")
 }
+
+func TestRenderHTMLPackageContextInRollupAndAccordion(t *testing.T) {
+	ctx := models.PackageContext{
+		Name:            "express",
+		Description:     "Fast, unopinionated, minimalist web framework for Node.js.",
+		WeeklyDownloads: 109_100_000,
+		License:         "MIT",
+		Homepage:        "https://expressjs.com",
+		Popularity:      models.PopularityUbiquitous,
+	}
+	result := models.ScanResult{
+		Meta: models.ScanMeta{
+			Timestamp:       time.Now().UTC(),
+			InputPath:       "express@4.17.1",
+			ResolvedPackage: "express@4.17.1",
+			PackageContext:  &ctx,
+			ComponentCount:  2,
+			FindingCount:    2,
+		},
+		Summary: models.ScanSummary{Total: 2, P3: 2, OK: 2},
+		Components: []models.Component{
+			{Name: "express", Version: "4.17.1", Direct: true, Path: []string{"express"}},
+			{Name: "qs", Version: "6.7.0", Direct: false, Path: []string{"express", "qs"}},
+		},
+		Findings: []models.Finding{
+			{
+				Component:      models.Component{Name: "express", Version: "4.17.1", Direct: true, Path: []string{"express"}},
+				CveMatch:       models.CveMatch{CVEID: "CVE-2024-29041"},
+				Classification: models.Classification{Priority: models.PriorityP4},
+				Verdict:        models.VerdictOK,
+			},
+			{
+				Component:      models.Component{Name: "qs", Version: "6.7.0", Direct: false, Path: []string{"express", "qs"}},
+				CveMatch:       models.CveMatch{CVEID: "CVE-2022-24999"},
+				Classification: models.Classification{Priority: models.PriorityP3},
+				Verdict:        models.VerdictOK,
+				PackageContext: &models.PackageContext{
+					Name:            "qs",
+					Description:     "A querystring parser that supports nesting and arrays.",
+					WeeklyDownloads: 76_000_000,
+					License:         "BSD-3-Clause",
+					Popularity:      models.PopularityUbiquitous,
+				},
+			},
+		},
+		Packages: map[string]models.PackageContext{
+			"express": ctx,
+			"qs": {
+				Name:            "qs",
+				Description:     "A querystring parser that supports nesting and arrays.",
+				WeeklyDownloads: 76_000_000,
+				License:         "BSD-3-Clause",
+				Popularity:      models.PopularityUbiquitous,
+			},
+		},
+	}
+	var b strings.Builder
+	require.NoError(t, report.RenderHTMLWriter(&b, result))
+	html := b.String()
+	require.Contains(t, html, "Priority Upgrades")
+	require.Contains(t, html, "Fast, unopinionated, minimalist web framework")
+	require.Contains(t, html, "querystring parser")
+	require.Contains(t, html, "expressjs.com")
+	require.Contains(t, html, "pkg-profile")
+	require.Contains(t, html, "stat-pill")
+}

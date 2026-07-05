@@ -34,7 +34,7 @@ func emitOutput(opts Options, result models.ScanResult) error {
 	default:
 		ui.RenderScan(os.Stdout, result)
 		if len(result.Components) > 0 {
-			renderShadowDeps(os.Stdout, result)
+			renderShadowDeps(os.Stdout, opts, result)
 		}
 	}
 
@@ -52,7 +52,13 @@ func emitOutput(opts Options, result models.ScanResult) error {
 
 func osStderr() io.Writer { return os.Stderr }
 
-func renderShadowDeps(w io.Writer, result models.ScanResult) {
+func renderShadowDeps(w io.Writer, opts Options, result models.ScanResult) {
+	// Package lookups already list transitive findings with Path chains in the
+	// main table; the shadow summary is scan-oriented unless --tree is set.
+	if opts.Package != "" && !opts.ShowTree {
+		return
+	}
+
 	allFindings := append(result.Findings, result.Accepted...)
 	tree := inventory.BuildTree(result.Components, allFindings)
 
@@ -91,8 +97,10 @@ func renderShadowDeps(w io.Writer, result models.ScanResult) {
 		}
 		fmt.Fprintf(w, "  %-34s%s%s%s\n", name, scope, shadow, cve)
 	}
-	fmt.Fprintf(w, "\n  %s\n",
-		ui.Dim(w, "Use --tree to expand the full nested dependency tree."))
+	if opts.Package == "" {
+		fmt.Fprintf(w, "\n  %s\n",
+			ui.Dim(w, "Use --tree to expand the full nested dependency tree."))
+	}
 }
 
 func inputHash(parts ...string) string {

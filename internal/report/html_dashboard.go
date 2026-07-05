@@ -35,6 +35,11 @@ func writeDashboard(b *strings.Builder, result models.ScanResult, data dashboard
 		fmt.Fprintf(b, `<span class="meta-chip"><label>Deps</label>%d (%d direct · %d nested)</span>`,
 			dt.Total, dt.Direct, dt.Transitive)
 	}
+	if meta.PackageContext != nil {
+		if line := pkgmetaSummaryLine(meta.PackageContext); line != "" {
+			fmt.Fprintf(b, `<span class="meta-chip meta-chip-wide"><label>Package</label>%s</span>`, esc(line))
+		}
+	}
 	fmt.Fprintf(b, `<span class="meta-chip meta-chip-accent"><label>Findings</label>%d</span>`, meta.FindingCount)
 	b.WriteString(`</div></header>`)
 
@@ -85,7 +90,7 @@ func writeDashboard(b *strings.Builder, result models.ScanResult, data dashboard
 	}
 
 	rollups := rollup.BuildUpgradeRollup(result.Components, append(append([]models.Finding{}, result.Findings...), result.Accepted...))
-	writeUpgradeRollupSection(b, rollups)
+	writeUpgradeRollupSection(b, rollups, result.Packages)
 	if len(result.Accepted) > 0 {
 		writeAcceptedRiskSection(b, result.Accepted)
 	}
@@ -200,16 +205,27 @@ func writePackageAccordion(b *strings.Builder, pkg packagePageData, packages map
 	}
 
 	fmt.Fprintf(b, `<details class="pkg-accord" id="pkg-%s">`, esc(pkg.Slug))
-	fmt.Fprintf(b, `<summary class="pkg-accord-summary"><span class="accord-name">%s</span><span class="accord-ver">@%s</span>%s`,
-		esc(pkg.Name), esc(pkg.Version), cveBadge)
+	fmt.Fprintf(b, `<summary class="pkg-accord-summary"><span class="accord-name">%s</span><span class="accord-ver">@%s</span>`,
+		esc(pkg.Name), esc(pkg.Version))
+	ctx := pkg.Context
+	if ctx == nil {
+		if c, ok := packages[pkg.Name]; ok {
+			copy := c
+			ctx = &copy
+		}
+	}
+	if ctx != nil {
+		b.WriteString(`<span class="accord-eco">`)
+		writePackageEcoPillsCompact(b, ctx)
+		b.WriteString(`</span>`)
+	}
+	fmt.Fprintf(b, `%s`, cveBadge)
 	if pkg.Shadow > 0 {
 		fmt.Fprintf(b, `<span class="accord-shadow">%d nested</span>`, pkg.Shadow)
 	}
 	b.WriteString(`</summary><div class="pkg-accord-body">`)
 
-	if pkg.Context != nil && strings.TrimSpace(pkg.Context.Description) != "" {
-		fmt.Fprintf(b, `<p class="pkg-accord-desc">%s</p>`, esc(pkgmetaSummaryTruncate(pkg.Context.Description, 200)))
-	}
+	writePackageProfile(b, pkg.Name, pkg.Version, ctx)
 
 	b.WriteString(`<div class="pkg-accord-meta">`)
 	writeDossierMeta(b, "Role", dependencyRoleLabel(pkg.Component))

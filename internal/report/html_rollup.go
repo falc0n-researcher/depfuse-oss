@@ -8,7 +8,7 @@ import (
 	"github.com/falc0n-researcher/depfuse-oss/pkg/models"
 )
 
-func writeUpgradeRollupSection(b *strings.Builder, rollups []rollup.UpgradeRollup) {
+func writeUpgradeRollupSection(b *strings.Builder, rollups []rollup.UpgradeRollup, packages map[string]models.PackageContext) {
 	if len(rollups) == 0 {
 		return
 	}
@@ -29,15 +29,19 @@ func writeUpgradeRollupSection(b *strings.Builder, rollups []rollup.UpgradeRollu
 		if r.FixVersion != "" {
 			fix = "≥ " + r.FixVersion
 		}
-		fmt.Fprintf(b, `<div class="rollup-card"><div class="rollup-head"><span class="rollup-pkg">%s</span><span class="priority-pill %s">%s</span></div>`,
+		fmt.Fprintf(b, `<div class="rollup-card %s"><div class="rollup-accent"></div><div class="rollup-inner">`, rollupPriorityClass(r.Worst))
+		fmt.Fprintf(b, `<div class="rollup-head"><span class="rollup-pkg">%s</span><span class="priority-pill %s">%s</span></div>`,
 			esc(root), priorityClass(r.Worst), esc(r.Worst.String()))
-		fmt.Fprintf(b, `<div class="rollup-stats"><span>%d CVE matches</span><span>%d packages affected</span></div>`,
-			r.FindingCount, r.PackageCount)
-		fmt.Fprintf(b, `<div class="rollup-fix"><span class="rollup-fix-label">Suggested upgrade</span><span class="ver-to">%s</span></div>`, esc(fix))
-		if len(r.Packages) > 0 && r.PackageCount > 1 {
-			fmt.Fprintf(b, `<div class="rollup-affected dim">Includes %s</div>`, esc(strings.Join(truncateList(r.Packages, 5), ", ")))
+		if ctx, ok := packages[r.RootName]; ok {
+			writePackageProfile(b, r.RootName, r.RootVersion, &ctx)
 		}
-		b.WriteString(`</div>`)
+		fmt.Fprintf(b, `<div class="rollup-metrics"><span class="rollup-metric"><strong>%d</strong> CVE matches</span><span class="rollup-metric"><strong>%d</strong> packages affected</span></div>`,
+			r.FindingCount, r.PackageCount)
+		fmt.Fprintf(b, `<div class="rollup-fix"><span class="rollup-fix-label">Suggested upgrade</span><span class="ver-to rollup-fix-ver">%s</span></div>`, esc(fix))
+		if len(r.Packages) > 0 && r.PackageCount > 1 {
+			fmt.Fprintf(b, `<div class="rollup-affected"><span class="rollup-affected-label">Transitive footprint</span><span>%s</span></div>`, esc(strings.Join(truncateList(r.Packages, 5), ", ")))
+		}
+		b.WriteString(`</div></div>`)
 	}
 	b.WriteString(`</div></section>`)
 }
@@ -74,4 +78,8 @@ func truncateList(items []string, max int) []string {
 	out := append([]string{}, items[:max]...)
 	out = append(out, fmt.Sprintf("+%d more", len(items)-max))
 	return out
+}
+
+func rollupPriorityClass(p models.Priority) string {
+	return "rollup-" + strings.ToLower(p.String())
 }

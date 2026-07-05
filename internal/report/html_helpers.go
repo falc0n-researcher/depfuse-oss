@@ -5,6 +5,7 @@ import (
 	"html"
 	"strings"
 
+	"github.com/falc0n-researcher/depfuse-oss/internal/pkgmeta"
 	"github.com/falc0n-researcher/depfuse-oss/pkg/models"
 )
 
@@ -199,6 +200,10 @@ func verdictClass(v models.Verdict) string {
 
 func priorityClass(p models.Priority) string {
 	return "priority-" + strings.ToLower(p.String())
+}
+
+func pkgmetaSummaryLine(ctx *models.PackageContext) string {
+	return pkgmeta.SummaryLine(ctx)
 }
 
 func pkgmetaSummaryTruncate(s string, max int) string {
