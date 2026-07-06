@@ -23,6 +23,8 @@ func Compute(comp models.Component, priority models.Priority, band models.Confid
 		v, reason = models.VerdictFixSoon, fmt.Sprintf("P1 weaponized in dev/build tooling %s@%s — fix soon, not release-blocking", comp.Name, comp.Version)
 	case priority == models.PriorityP2:
 		v, reason = models.VerdictFixSoon, fmt.Sprintf("P2 exploit available for %s@%s — fix soon", comp.Name, comp.Version)
+	case priority == models.PriorityP3:
+		return models.VerdictWatch, fmt.Sprintf("P3 no known exploit tooling for %s@%s, but EPSS indicates elevated exploitation likelihood — watch for evidence changes", comp.Name, comp.Version)
 	default:
 		return models.VerdictOK, fmt.Sprintf("No known exploit for %s@%s — OK to ship; monitor for changes", comp.Name, comp.Version)
 	}
@@ -79,6 +81,8 @@ func ParseFailTiers(s string) map[models.Priority]bool {
 			out[models.PriorityP1] = true
 		case "p2", "t2", "poc":
 			out[models.PriorityP2] = true
+		case "p3", "t3", "watch":
+			out[models.PriorityP3] = true
 		}
 	}
 	return out

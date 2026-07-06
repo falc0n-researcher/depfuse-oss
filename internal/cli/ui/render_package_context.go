@@ -29,6 +29,11 @@ func renderPackageContextHeader(w io.Writer, ctx *models.PackageContext) {
 	if ctx.Homepage != "" {
 		fmt.Fprintf(w, "  %s\n", Dim(w, ctx.Homepage))
 	}
+	if len(ctx.LifecycleScripts) > 0 {
+		fmt.Fprintf(w, "  %s\n", Dim(w, fmt.Sprintf(
+			"Install-time execution present: %s (supply-chain context — does not affect priority tier)",
+			strings.Join(ctx.LifecycleScripts, ", "))))
+	}
 }
 
 func renderPackageContextLine(w io.Writer, comp models.Component, ctx *models.PackageContext, indent string) {

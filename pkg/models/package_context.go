@@ -19,4 +19,9 @@ type PackageContext struct {
 	License         string            `json:"license,omitempty"`
 	Homepage        string            `json:"homepage,omitempty"`
 	Popularity      PackagePopularity `json:"popularity,omitempty"`
+	// LifecycleScripts lists npm install-time hooks (preinstall, install,
+	// postinstall, prepare) present on the package's latest published
+	// version. This is supply-chain context, not exploit evidence — it never
+	// affects Priority or Verdict.
+	LifecycleScripts []string `json:"lifecycleScripts,omitempty"`
 }

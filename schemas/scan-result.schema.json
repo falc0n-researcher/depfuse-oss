@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "scan-result.schema.json",
+  "title": "ScanResult",
+  "description": "Top-level `depfuse scan --format json` output. Depfuse classifies public exploit evidence for pinned npm dependencies; it does not assess whether a CVE is reachable in application code (see the `scopeBoundary` note in each finding's briefing).",
+  "type": "object",
+  "required": ["schemaVersion", "meta", "summary", "findings"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "ScanResult JSON contract version. Bumped only on a breaking change to top-level field names or types."
+    },
+    "meta": {
+      "type": "object",
+      "required": ["timestamp", "durationMs", "componentCount", "findingCount"],
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "snapshotVersion": { "type": "string" },
+        "snapshotHash": { "type": "string" },
+        "inputPath": { "type": "string" },
+        "inputHash": { "type": "string" },
+        "durationMs": { "type": "integer" },
+        "componentCount": { "type": "integer" },
+        "findingCount": { "type": "integer" },
+        "osvCacheHits": { "type": "integer" },
+        "osvQueries": { "type": "integer" },
+        "osvChunks": { "type": "integer" },
+        "suppressedCount": { "type": "integer" },
+        "acceptedCount": { "type": "integer" },
+        "reopenedCount": { "type": "integer" },
+        "resolvedPackage": { "type": "string" },
+        "packageNote": { "type": "string" },
+        "dependencyTree": {
+          "type": "object",
+          "properties": {
+            "total": { "type": "integer" },
+            "direct": { "type": "integer" },
+            "transitive": { "type": "integer" },
+            "root": { "type": "string" }
+          }
+        },
+        "coverage": {
+          "type": "object",
+          "description": "Lockfile, transitive-resolution, and OSV-index completeness for this scan. A non-'complete' status means the scan may be missing dependencies or advisories — see `message`.",
+          "required": ["status", "hasLockfile", "message"],
+          "properties": {
+            "status": { "enum": ["complete", "partial", "incomplete"] },
+            "hasLockfile": { "type": "boolean" },
+            "manifestOnly": { "type": "boolean" },
+            "unresolvedCount": { "type": "integer" },
+            "directCount": { "type": "integer" },
+            "transitiveCount": { "type": "integer" },
+            "totalCount": { "type": "integer" },
+            "peerDependencyCount": {
+              "type": "integer",
+              "description": "Packages present with no tracked parent in the dependency graph (optional/peer deps) — scanned, but not shown in the dependency-path tree."
+            },
+            "snapshotMode": {
+              "enum": ["online", "full-offline-db", "embedded-snapshot"],
+              "description": "'embedded-snapshot' means only weaponized (KEV/Nuclei/Metasploit/ExploitDB/PoC/EPSS>=0.05) advisories are indexed — quiet advisories are not covered until `depfuse collect` runs."
+            },
+            "message": { "type": "string" }
+          }
+        },
+        "inputMode": { "enum": ["cve"] }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total", "p0", "p1", "p2", "p3", "p4", "fixNow", "fixSoon", "ok"],
+      "properties": {
+        "total": { "type": "integer" },
+        "p0": { "type": "integer" },
+        "p1": { "type": "integer" },
+        "p2": { "type": "integer" },
+        "p3": { "type": "integer" },
+        "p4": { "type": "integer" },
+        "fixNow": { "type": "integer" },
+        "fixSoon": { "type": "integer" },
+        "ok": { "type": "integer" }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "finding.schema.json" }
+    },
+    "suppressed": {
+      "type": "array",
+      "items": { "$ref": "finding.schema.json" },
+      "description": "Findings hidden by .depfuseignore"
+    },
+    "accepted": {
+      "type": "array",
+      "items": { "$ref": "finding.schema.json" },
+      "description": "Findings silenced by a stored accepted-risk decision that has not reopened"
+    },
+    "unresolved": {
+      "type": "array",
+      "description": "Lockfile-pinned components that could not be resolved to a concrete version and were therefore excluded from OSV matching — never silently dropped.",
+      "items": {
+        "type": "object",
+        "required": ["name", "unresolved"],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "scope": { "enum": ["prod", "dev"] },
+          "unresolved": { "type": "boolean" },
+          "unresolvedReason": {
+            "enum": ["private-registry", "not-found", "auth-required", "network-error", "offline-mode"]
+          }
+        }
+      }
+    },
+    "watch": { "type": "object", "description": "depfuse watch decision-memory digest (reopened/silent decisions, escalations, intel changes)" },
+    "delta": { "type": "object", "description": "Changes since the previous scan of this input" },
+    "packages": {
+      "type": "object",
+      "description": "npm registry ecosystem context keyed by package name",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "weeklyDownloads": { "type": "integer" },
+          "license": { "type": "string" },
+          "homepage": { "type": "string" },
+          "popularity": { "enum": ["ubiquitous", "widely-used", "popular", "moderate", "niche"] },
+          "lifecycleScripts": {
+            "type": "array",
+            "items": { "enum": ["preinstall", "install", "postinstall", "prepare"] },
+            "description": "npm install-time hooks present on the latest published version. Supply-chain context only — never affects priority or verdict."
+          }
+        }
+      }
+    }
+  }
+}

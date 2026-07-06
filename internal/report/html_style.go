@@ -567,7 +567,7 @@ details[open] > .dep-summary .dep-chevron { transform: rotate(45deg); margin-top
 .bar-fix-now { background: var(--danger); }
 .bar-fix-soon { background: var(--warn); }
 .bar-ok { background: var(--ok); }
-.bar-exploitable { background: var(--accent); }
+.bar-weaponized { background: var(--accent); }
 
 /* ── Sections ── */
 .section { margin-bottom: 2.25rem; }
@@ -720,6 +720,10 @@ details[open] > .dep-summary .dep-chevron { transform: rotate(45deg); margin-top
   background: rgba(245, 158, 11, .08);
   border: 1px solid rgba(245, 158, 11, .35);
   color: var(--warn);
+}
+.coverage-note {
+  opacity: .8;
+  font-weight: 400;
 }
 .dossier-upgrade-card {
   background: linear-gradient(135deg, rgba(255,247,237,.5) 0%, var(--surface) 60%);

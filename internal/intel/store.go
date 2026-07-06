@@ -75,6 +75,15 @@ func (s *Store) Path() string { return s.path }
 // Version returns snapshot version string.
 func (s *Store) Version() string { return s.version }
 
+// IsWeaponizedOnly reports whether this database was pruned to the
+// weaponized-only index (via PruneToWeaponized) — the same reduction shipped
+// as the embedded first-run snapshot. Quiet/non-tiering advisories are absent
+// until a full `depfuse collect` runs.
+func (s *Store) IsWeaponizedOnly() bool {
+	v, _ := s.metaGet("weaponized_only")
+	return v == "true"
+}
+
 // Hash returns a SHA256 hash of the database file.
 func (s *Store) Hash() (string, error) {
 	data, err := os.ReadFile(s.path)

@@ -54,6 +54,28 @@ func TestVulnCheckKEVAndXDBCitations(t *testing.T) {
 	require.True(t, hasPrimary)
 }
 
+func TestXDBIsCitationOnlyAndNonTiering(t *testing.T) {
+	s := tempStore(t)
+	now := time.Now().UTC()
+	require.NoError(t, s.UpsertArtifact(models.RawArtifact{
+		ID: "XDB:024996c990cc", CVEID: "CVE-2099-0001", Source: models.SourceVulnCheckXDB,
+		TrustClass: models.TrustHigh, MaturityTag: models.MaturityVerified,
+		Title: "VulnCheck XDB PoC", URL: "https://vulncheck.com/xdb/024996c990cc", ObservedAt: now,
+	}))
+	cl := &classify.Classifier{Store: s}
+	class, err := cl.Classify(models.CveMatch{CVEID: "CVE-2099-0001"})
+	require.NoError(t, err)
+
+	// XDB alone must never elevate priority — it's enrichment, not a tiering signal.
+	require.Equal(t, models.PriorityP4, class.Priority)
+	require.False(t, class.Signals.KEV)
+	require.False(t, class.Signals.Nuclei)
+	require.False(t, class.Signals.Metasploit)
+
+	require.Len(t, class.Evidence, 1)
+	require.Contains(t, class.Evidence[0].Claim, "citation only, does not affect priority tier")
+}
+
 func TestGHSAAliasResolvesArtifacts(t *testing.T) {
 	s := tempStore(t)
 	require.NoError(t, s.UpsertAlias("GHSA-jfhv-c572-7mpm", "CVE-2021-44228"))

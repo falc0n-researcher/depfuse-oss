@@ -1,5 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "finding.schema.json",
   "title": "Finding",
   "type": "object",
   "required": ["component", "cve", "classification", "verdict"],
@@ -19,7 +20,11 @@
           "description": "Dependency chain from direct deps to this package"
         },
         "manifest": { "type": "string" },
-        "lockfileRoot": { "type": "string" }
+        "lockfileRoot": { "type": "string" },
+        "pathConfidence": {
+          "enum": ["exact", "low"],
+          "description": "'exact' for npm (full recorded parent chain); 'low' for yarn/pnpm/bun (flat lockfile format, path is just [name])"
+        }
       }
     },
     "cve": {

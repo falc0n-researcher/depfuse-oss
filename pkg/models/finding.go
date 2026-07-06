@@ -222,14 +222,20 @@ type ScanMeta struct {
 
 // ScanCoverageMeta describes lockfile and transitive resolution completeness.
 type ScanCoverageMeta struct {
-	Status          string `json:"status"`
-	HasLockfile     bool   `json:"hasLockfile"`
-	ManifestOnly    bool   `json:"manifestOnly,omitempty"`
-	UnresolvedCount int    `json:"unresolvedCount,omitempty"`
-	DirectCount     int    `json:"directCount,omitempty"`
-	TransitiveCount int    `json:"transitiveCount,omitempty"`
-	TotalCount      int    `json:"totalCount,omitempty"`
-	Message         string `json:"message"`
+	Status              string `json:"status"`
+	HasLockfile         bool   `json:"hasLockfile"`
+	ManifestOnly        bool   `json:"manifestOnly,omitempty"`
+	UnresolvedCount     int    `json:"unresolvedCount,omitempty"`
+	DirectCount         int    `json:"directCount,omitempty"`
+	TransitiveCount     int    `json:"transitiveCount,omitempty"`
+	TotalCount          int    `json:"totalCount,omitempty"`
+	PeerDependencyCount int    `json:"peerDependencyCount,omitempty"`
+	// SnapshotMode is "online" (live OSV API), "full-offline-db" (a complete
+	// `depfuse collect` database used offline), or "embedded-snapshot" (the
+	// weaponized-only index bundled with the binary — quiet/non-tiering
+	// advisories are not indexed until `depfuse collect` runs).
+	SnapshotMode string `json:"snapshotMode,omitempty"`
+	Message      string `json:"message"`
 }
 
 func (c *ScanCoverageMeta) IsIncomplete() bool {
@@ -265,21 +271,33 @@ type ScanSummary struct {
 	OK      int `json:"ok"`
 }
 
-// Exploitable counts P0 + P1 — the buckets that drive FIX NOW.
-func (s ScanSummary) Exploitable() int { return s.P0 + s.P1 }
+// WeaponizedExposure counts P0 + P1 — dependencies with public exploit
+// evidence (KEV, weaponized tooling, or a verified PoC), the buckets that
+// drive FIX NOW. This is not a claim of app-level reachability.
+func (s ScanSummary) WeaponizedExposure() int { return s.P0 + s.P1 }
 
 // Backlog counts P3 + P4 — no actionable exploit signal.
 func (s ScanSummary) Backlog() int { return s.P3 + s.P4 }
 
+// CurrentSchemaVersion is the ScanResult JSON contract version. Bump it (and
+// schemas/scan-result.schema.json) only on a breaking change to top-level
+// field names or types — additive fields don't require a bump.
+const CurrentSchemaVersion = "1.0"
+
 // ScanResult is the full scan output.
 type ScanResult struct {
-	Meta        ScanMeta                  `json:"meta"`
-	Summary     ScanSummary               `json:"summary"`
-	Findings    []Finding                 `json:"findings"`
-	Suppressed  []Finding                 `json:"suppressed,omitempty"`
-	Accepted    []Finding                 `json:"accepted,omitempty"`
-	Watch       *WatchResult              `json:"watch,omitempty"`
-	Delta       *ScanDelta                `json:"delta,omitempty"`
+	SchemaVersion string       `json:"schemaVersion"`
+	Meta          ScanMeta     `json:"meta"`
+	Summary       ScanSummary  `json:"summary"`
+	Findings      []Finding    `json:"findings"`
+	Suppressed    []Finding    `json:"suppressed,omitempty"`
+	Accepted      []Finding    `json:"accepted,omitempty"`
+	Watch         *WatchResult `json:"watch,omitempty"`
+	Delta         *ScanDelta   `json:"delta,omitempty"`
+	// Unresolved lists lockfile-pinned components that could not be resolved to
+	// a concrete version and were therefore excluded from OSV matching — never
+	// silently dropped. See Component.UnresolvedReason for why.
+	Unresolved  []Component               `json:"unresolved,omitempty"`
 	ShowIgnored bool                      `json:"-"`
 	Verbose     bool                      `json:"-"`
 	ShowTree    bool                      `json:"-"` // expand full shadow dep tree in CLI output

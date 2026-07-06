@@ -2,7 +2,7 @@
 
 Thank you for contributing. Depfuse follows standard Go open-source conventions.
 
-**Scope:** v0.1/v0.1.x covers exploit-evidence decisions for npm dependency exposure. App-context features (reachability, VEX export) are planned for v0.2 and should not be added ahead of that milestone.
+**Scope:** v1 covers exploit-evidence decisions for npm dependency exposure. App-context features (reachability, VEX export) are planned for v2 and should not be added ahead of that milestone.
 
 ---
 

@@ -49,7 +49,7 @@ func writeDashboard(b *strings.Builder, result models.ScanResult, data dashboard
 
 	// ── KPI strip ──
 	b.WriteString(`<div class="dash-kpis">`)
-	writeDashKPI(b, "kpi-danger", fmt.Sprint(s.Exploitable()), "Exploitable", "P0 + P1")
+	writeDashKPI(b, "kpi-danger", fmt.Sprint(s.WeaponizedExposure()), "Weaponized Exposure", "P0 + P1")
 	writeDashKPI(b, "kpi-alert", fmt.Sprint(s.FixNow), "Fix Now", "Block release")
 	writeDashKPI(b, "kpi-warn", fmt.Sprint(s.FixSoon), "Fix Soon", "Plan fix")
 	writeDashKPI(b, "kpi-ok", fmt.Sprint(s.OK), "OK", "No action")

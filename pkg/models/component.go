@@ -20,4 +20,12 @@ type Component struct {
 	LockfileRoot string   `json:"lockfileRoot,omitempty"` // relative path to lockfile dir from scan root
 	Spec         string   `json:"spec,omitempty"`         // original manifest range spec (manifest-only scans)
 	Unresolved   bool     `json:"unresolved,omitempty"`   // true when no concrete version could be pinned
+	// UnresolvedReason explains why, when Unresolved is true: "private-registry",
+	// "not-found", "auth-required", "network-error", or "offline-mode". Empty
+	// when Unresolved is false.
+	UnresolvedReason string `json:"unresolvedReason,omitempty"`
+	// PathConfidence is "exact" when Path reflects the true dependency chain
+	// (npm lockfiles) or "low" when the lockfile format only yields a flat,
+	// unranked package list (yarn/pnpm/bun) and Path is just [Name].
+	PathConfidence string `json:"pathConfidence,omitempty"`
 }

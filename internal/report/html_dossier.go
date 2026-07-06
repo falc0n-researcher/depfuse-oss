@@ -61,8 +61,13 @@ func writeCoverageBanner(b *strings.Builder, cov *models.ScanCoverageMeta) {
 	if cov.IsIncomplete() {
 		class = "coverage-incomplete"
 	}
-	fmt.Fprintf(b, `<div class="coverage-banner %s"><strong>%s</strong><span>%s</span></div>`,
+	fmt.Fprintf(b, `<div class="coverage-banner %s"><strong>%s</strong><span>%s</span>`,
 		class, esc(strings.ToUpper(cov.Status)), esc(cov.Message))
+	if cov.PeerDependencyCount > 0 {
+		fmt.Fprintf(b, `<span class="coverage-note">%d peer/optional dependencies detected — scanned, but not shown in the dependency-path tree</span>`,
+			cov.PeerDependencyCount)
+	}
+	b.WriteString(`</div>`)
 }
 
 func writePackageDossierFindings(b *strings.Builder, findings []models.Finding, packages map[string]models.PackageContext) {

@@ -65,7 +65,7 @@ func TestGoldenScanDemoPackage(t *testing.T) {
 
 	require.Equal(t, 1, result.Summary.FixNow)
 	require.GreaterOrEqual(t, result.Summary.FixSoon, 1)
-	require.Greater(t, result.Summary.Backlog(), result.Summary.Exploitable())
+	require.Greater(t, result.Summary.Backlog(), result.Summary.WeaponizedExposure())
 	require.Greater(t, result.Summary.Backlog(), 0)
 }
 

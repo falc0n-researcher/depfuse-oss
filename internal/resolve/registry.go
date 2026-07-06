@@ -20,6 +20,25 @@ func SetNPMRegistryURLForTest(u string) {
 	npmRegistryBaseURL = u
 }
 
+// Unresolved reason codes surfaced on models.Component.UnresolvedReason.
+const (
+	ReasonPrivateRegistry = "private-registry"
+	ReasonNotFound        = "not-found"
+	ReasonAuthRequired    = "auth-required"
+	ReasonNetworkError    = "network-error"
+	ReasonOfflineMode     = "offline-mode"
+)
+
+// RegistryError classifies why a registry lookup failed, so callers can
+// surface a specific reason instead of silently dropping the package.
+type RegistryError struct {
+	Reason string
+	Err    error
+}
+
+func (e *RegistryError) Error() string { return e.Err.Error() }
+func (e *RegistryError) Unwrap() error { return e.Err }
+
 // FetchLatestVersion returns the semver published under the npm "latest" dist-tag.
 func FetchLatestVersion(ctx context.Context, name string) (string, error) {
 	name = strings.TrimSpace(name)
@@ -77,20 +96,30 @@ func FetchVersions(ctx context.Context, name string) ([]string, error) {
 	client := &http.Client{Timeout: 20 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, &RegistryError{Reason: ReasonNetworkError, Err: err}
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
-		return nil, fmt.Errorf("package %q not found on npm registry", name)
+		reason := ReasonNotFound
+		if strings.HasPrefix(name, "@") {
+			// registry.npmjs.org is the only registry depfuse queries — a scoped
+			// package 404ing there is most often published to a private registry,
+			// not genuinely absent from npm.
+			reason = ReasonPrivateRegistry
+		}
+		return nil, &RegistryError{Reason: reason, Err: fmt.Errorf("package %q not found on npm registry", name)}
+	}
+	if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
+		return nil, &RegistryError{Reason: ReasonAuthRequired, Err: fmt.Errorf("npm registry http %d for %q", resp.StatusCode, name)}
 	}
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("npm registry http %d for %q", resp.StatusCode, name)
+		return nil, &RegistryError{Reason: ReasonNetworkError, Err: fmt.Errorf("npm registry http %d for %q", resp.StatusCode, name)}
 	}
 	var meta struct {
 		Versions map[string]json.RawMessage `json:"versions"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&meta); err != nil {
-		return nil, fmt.Errorf("decode npm registry response: %w", err)
+		return nil, &RegistryError{Reason: ReasonNetworkError, Err: fmt.Errorf("decode npm registry response: %w", err)}
 	}
 	out := make([]string, 0, len(meta.Versions))
 	for v := range meta.Versions {

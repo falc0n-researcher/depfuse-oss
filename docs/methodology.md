@@ -22,7 +22,7 @@ Enumerate npm packages from lockfiles or (fallback) manifest + registry tree. Ea
 
 ### 2. Match
 
-For each resolved `npm/name@version`, query OSV online or from the offline index. Unresolved components are skipped.
+For each resolved `npm/name@version`, query OSV online or from the offline index. Components that can't be resolved to a concrete version (private registry, auth required, not found, network error, or offline mode) are excluded from matching, but never silently dropped — they're itemized with a reason in the "Unresolved Dependencies" output and mark the scan `SCAN INCOMPLETE`.
 
 ### 3. Classify
 
@@ -35,7 +35,10 @@ Map intelligence artifacts to tiers **P0–P4**. Key invariant: **unverified PoC
 | P0 | FIX NOW | OK |
 | P1 | FIX NOW | FIX SOON |
 | P2 | FIX SOON | FIX SOON |
-| P3 / P4 | OK | OK |
+| P3 | WATCH | WATCH |
+| P4 | OK | OK |
+
+WATCH never fails CI by default (add it explicitly with `--fail-on P0,P1,watch`) — it exists so a P3 finding is visible as "no known exploit yet, but worth watching," not indistinguishable from P4 hygiene noise.
 
 ### 5. Filter
 
@@ -67,6 +70,6 @@ Otherwise                             → P4 (hygiene)
 
 See [Limitations](limitations/). Highlights:
 
-* VulnCheck XDB is cited but does not currently elevate tier
-* GitHub PoC "verified" uses a stars ≥ 10 heuristic
-* EPSS P3 does not produce FIX SOON in scan mode
+* VulnCheck XDB is cited but does not currently elevate tier — every citation says so explicitly
+* GitHub PoC "verified" requires ≥2 corroborating signals, not stars alone; forks never qualify
+* Yarn/pnpm/bun dependency paths are flat (`pathConfidence: low`), unlike npm's full graph

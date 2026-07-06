@@ -29,6 +29,26 @@ depfuse decisions record CVE-2019-11358 \
 depfuse watch .
 ```
 
+## Explain a decision
+
+`depfuse decisions explain <CVE>` shows a stored decision's full history: what was decided and why, the evidence tier at decision time vs. the current re-classified tier, and whether it would reopen right now.
+
+```bash
+depfuse decisions explain CVE-2019-11358
+```
+
+```
+  CVE-2019-11358
+
+  Scope            jquery@3.2.1
+  Decision         accepted-risk
+  Reason           jquery only in internal admin, not exposed
+  Decided at       2026-01-15
+  Level then       P4
+  Level now        P2
+  Reopens: level changed P4 → P2
+```
+
 ## Reopen conditions
 
 | Trigger | Example |
@@ -42,6 +62,6 @@ The reopen threshold (0.90) is separate from the P3 classification threshold (0.
 
 ## What decisions are not
 
-* Not a substitute for VEX (planned v0.2)
+* Not a substitute for VEX (planned v2)
 * Not synced across team members by default
 * Not permanent — reopen conditions enforce revisiting when evidence escalates

@@ -45,7 +45,7 @@ depfuse package express@4.17.1 --depth 2   # single-package lookup
 ## What Depfuse does not do
 
 > **Warning — Scope boundary**  
-> Depfuse does **not** assess whether a CVE is reachable in your application's routes and code paths. It classifies **dependency exposure** by the strength of public exploit signals. App-context exploitability is planned for v0.2.
+> Depfuse does **not** assess whether a CVE is reachable in your application's routes and code paths. It classifies **dependency exposure** by the strength of public exploit signals. App-context exploitability is planned for v2.
 
 Depfuse is also:
 
@@ -58,8 +58,8 @@ Depfuse is also:
 1. **Resolve** — Walk `package.json` and lockfiles to enumerate pinned npm packages (production vs dev scope).
 2. **Match** — Query the OSV advisory database (online batch API or offline index) for each `name@version`.
 3. **Classify** — Map intelligence feed artifacts to exploit-evidence tiers **P0–P4**.
-4. **Verdict** — Apply scope-aware rules: **FIX NOW**, **FIX SOON**, or **OK**.
-5. **Report** — Emit findings with cited evidence receipts and optional upgrade rollup.
+4. **Verdict** — Apply scope-aware rules: **FIX NOW**, **FIX SOON**, **WATCH**, or **OK**.
+5. **Report** — Emit findings with cited evidence receipts, coverage/unresolved-dependency status, and optional upgrade rollup.
 
 ## Ecosystem support
 
@@ -76,11 +76,11 @@ Depfuse is also:
 
 ```
   Summary
-  ┌─────────────┬─────────┬──────────┬────┬─────────┐
-  │ Exploitable │ Fix Now │ Fix Soon │ OK │  Total  │
-  ├─────────────┼─────────┼──────────┼────┼─────────┤
-  │           1 │       1 │        1 │ 21 │      23 │
-  └─────────────┴─────────┴──────────┴────┴─────────┘
+  ┌─────────────────────┬─────────┬──────────┬────┬───────┐
+  │ Weaponized Exposure │ Fix Now │ Fix Soon │ OK │ Total │
+  ├─────────────────────┼─────────┼──────────┼────┼───────┤
+  │                   1 │       1 │        1 │ 21 │    23 │
+  └─────────────────────┴─────────┴──────────┴────┴───────┘
 
   FIX NOW because:
     • [KEV] Listed in VulnCheck KEV catalog

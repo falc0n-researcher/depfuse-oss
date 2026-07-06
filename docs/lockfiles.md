@@ -39,8 +39,8 @@ hero: /assets/images/hero-scan.png
 
 ## Known limitations
 
-* **yarn / pnpm / bun** — flat paths, no full install chains
-* **Peer dependencies** — not resolved or scanned
-* **Private registries** — only `registry.npmjs.org`; unresolved packages are skipped silently
+* **yarn / pnpm / bun** — flat paths, no full install chains. Transitive packages resolved this way are marked `pathConfidence: low` (vs `exact` for npm) and shown with an `(unranked)` note wherever a dependency chain renders, so a bare package name is never mistaken for a verified root dependency.
+* **Peer dependencies** — detected and counted, but not resolved against OSV; surfaced as a coverage note, not silently dropped
+* **Private registries** — Depfuse only queries `registry.npmjs.org`. Packages it can't resolve there (private-registry scoped packages, auth-required registries, not-found, offline mode, or a network error) are **never silently skipped**: they're listed in an "Unresolved Dependencies" section (CLI, HTML, and the `unresolved` JSON array) with the specific reason, and any unresolved dependency marks the scan **SCAN INCOMPLETE** (exit code 1) — the same as having no lockfile at all.
 
 Always commit a lockfile for reproducible, complete scans.

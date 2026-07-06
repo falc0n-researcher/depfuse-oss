@@ -54,11 +54,11 @@ depfuse cve CVE-2025-29927              # classify a CVE without a lockfile
 
 ```
   Summary
-  ┌─────────────┬─────────┬──────────┬────┬─────────┐
-  │ Exploitable │ Fix Now │ Fix Soon │ OK │  Total  │
-  ├─────────────┼─────────┼──────────┼────┼─────────┤
-  │           1 │       1 │        1 │ 21 │      23 │
-  └─────────────┴─────────┴──────────┴────┴─────────┘
+  ┌─────────────────────┬─────────┬──────────┬────┬───────┐
+  │ Weaponized Exposure │ Fix Now │ Fix Soon │ OK │ Total │
+  ├─────────────────────┼─────────┼──────────┼────┼───────┤
+  │                   1 │       1 │        1 │ 21 │    23 │
+  └─────────────────────┴─────────┴──────────┴────┴───────┘
 
   │ P0 · Exploited    │ CVE-2025-29927 │ next@15.1.0   │ KEV Nuc  │ FIX NOW  │
   │ P2 · Exploit Avail │ CVE-2019-11358 │ jquery@3.2.1  │ EDB      │ FIX SOON │
@@ -119,10 +119,10 @@ Every actionable finding ships **evidence receipts** — `[KEV]` `[Nuc]` `[MSF]`
 
 | | Grype / Trivy | Depfuse |
 |---|---------------|---------|
-| Output | Sorted CVE list + CVSS | **FIX NOW / FIX SOON / OK** |
+| Output | Sorted CVE list + CVSS | **FIX NOW / FIX SOON / WATCH / OK** |
 | Signal | Severity scores | **Public exploit evidence** |
 | Verdicts | You decide | **Cited receipts per finding** |
-| Reachability | Varies | **Not yet** (v0.2 planned) |
+| Reachability | Varies | **Not yet** (v2 planned) |
 
 ## Build from source
 

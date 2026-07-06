@@ -80,6 +80,9 @@ DELETE FROM vulnerabilities WHERE id NOT IN (
 	if err := tx.Commit(); err != nil {
 		return st, err
 	}
+	if err := s.metaSet("weaponized_only", "true"); err != nil {
+		return st, err
+	}
 
 	// VACUUM reclaims the space freed above; it cannot run inside a transaction.
 	if _, err := s.db.Exec(`VACUUM`); err != nil {

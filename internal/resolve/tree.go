@@ -309,7 +309,12 @@ func statsForComponents(comps []models.Component, roots []models.Component) Tree
 	}
 }
 
-// FormatDependencyPath renders a human-readable import chain for receipts and CLI.
+// FormatDependencyPath renders a human-readable import chain for receipts and
+// CLI. Transitive packages resolved from a flat lockfile format (yarn, pnpm,
+// bun — see models.Component.PathConfidence) carry no real parent chain, so a
+// lone package name here does not mean "this is a root dependency"; it means
+// the lockfile format doesn't record ancestry. That's flagged inline so
+// reports don't imply false precision.
 func FormatDependencyPath(comp models.Component) string {
 	parts := append([]string{}, comp.Path...)
 	if len(parts) == 0 {
@@ -318,7 +323,11 @@ func FormatDependencyPath(comp models.Component) string {
 	if parts[len(parts)-1] != comp.Name {
 		parts = append(parts, comp.Name)
 	}
-	return strings.Join(parts, " → ")
+	chain := strings.Join(parts, " → ")
+	if !comp.Direct && comp.PathConfidence == "low" {
+		chain += " (unranked)"
+	}
+	return chain
 }
 
 func exactVersionSpec(spec string) (string, bool) {

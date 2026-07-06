@@ -2,6 +2,7 @@ package resolve
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -94,9 +95,16 @@ func Resolve(opts Options) ([]models.Component, error) {
 // stays Unresolved so it is excluded from matching rather than silently cleared.
 func pinManifestVersions(ctx context.Context, offline bool, comps []models.Component) {
 	if offline {
+		for i := range comps {
+			c := &comps[i]
+			if c.Unresolved && c.Spec != "" {
+				c.UnresolvedReason = ReasonOfflineMode
+			}
+		}
 		return
 	}
 	cache := map[string][]string{}
+	errCache := map[string]error{}
 	for i := range comps {
 		c := &comps[i]
 		if !c.Unresolved || c.Spec == "" {
@@ -104,8 +112,14 @@ func pinManifestVersions(ctx context.Context, offline bool, comps []models.Compo
 		}
 		versions, ok := cache[c.Name]
 		if !ok {
+			if err, tried := errCache[c.Name]; tried {
+				c.UnresolvedReason = registryErrorReason(err)
+				continue
+			}
 			v, err := FetchVersions(ctx, c.Name)
 			if err != nil {
+				errCache[c.Name] = err
+				c.UnresolvedReason = registryErrorReason(err)
 				continue
 			}
 			versions = v
@@ -115,8 +129,18 @@ func pinManifestVersions(ctx context.Context, offline bool, comps []models.Compo
 			c.Version = best
 			c.PURL = purl.NPM(c.Name, best)
 			c.Unresolved = false
+			c.UnresolvedReason = ""
+			continue
 		}
 	}
+}
+
+func registryErrorReason(err error) string {
+	var re *RegistryError
+	if errors.As(err, &re) {
+		return re.Reason
+	}
+	return ReasonNetworkError
 }
 
 func discoverManifests(root string) ([]string, error) {

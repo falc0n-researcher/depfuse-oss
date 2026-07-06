@@ -219,6 +219,55 @@ func buildWatchDigest(wr models.WatchResult) models.WatchDigest {
 	return d
 }
 
+// RunDecisionsExplain describes every stored decision for a CVE: the
+// evidence tier at decision time, the current re-classified tier, and
+// whether the decision would reopen right now under its reopen policy.
+func (r *Runner) RunDecisionsExplain(ctx context.Context, cve, root, dbPath string, offline bool) ([]models.DecisionExplain, error) {
+	cve = strings.ToUpper(strings.TrimSpace(cve))
+	if cve == "" {
+		return nil, fmt.Errorf("CVE id required")
+	}
+	if root == "" {
+		root = "."
+	}
+	file, err := decisions.Load(root)
+	if err != nil {
+		return nil, err
+	}
+	var matches []models.StoredDecision
+	for _, d := range file.Decisions {
+		if strings.EqualFold(d.CVE, cve) {
+			matches = append(matches, d)
+		}
+	}
+	if len(matches) == 0 {
+		return nil, fmt.Errorf("no stored decision for %s in %s", cve, file.Path)
+	}
+
+	store, err := r.openStore(ctx, Options{DBPath: dbPath, Offline: offline})
+	if err != nil {
+		return nil, err
+	}
+	defer store.Close()
+
+	cm := models.CveMatch{CVEID: cve}
+	_ = intel.EnrichCveMatch(ctx, store, &cm, offline)
+	classifier := &classify.Classifier{Store: store}
+	class, err := classifier.Classify(cm)
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]models.DecisionExplain, 0, len(matches))
+	for _, d := range matches {
+		reopen, reason := decisions.ShouldReopen(d, class)
+		out = append(out, models.DecisionExplain{
+			Decision: d, CurrentLevel: class.Priority, WouldReopen: reopen, ReopenReason: reason,
+		})
+	}
+	return out, nil
+}
+
 // ListDecisions returns decisions from root/.depfuse/decisions.yaml.
 func ListDecisions(root string) (decisions.File, error) {
 	if root == "" {
@@ -240,7 +289,7 @@ func ExportDecisions(root, format string) error {
 		enc.SetIndent("", "  ")
 		return enc.Encode(doc)
 	case "openvex":
-		return fmt.Errorf("OpenVEX export is planned for v0.2 — use --format yaml or json")
+		return fmt.Errorf("OpenVEX export is planned for v2 — use --format yaml or json")
 	default:
 		data, err := decisions.MarshalYAML(doc)
 		if err != nil {

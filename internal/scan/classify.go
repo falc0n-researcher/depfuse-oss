@@ -8,6 +8,7 @@ import (
 	"github.com/falc0n-researcher/depfuse-oss/internal/brief"
 	"github.com/falc0n-researcher/depfuse-oss/internal/classify"
 	"github.com/falc0n-researcher/depfuse-oss/internal/intel"
+	"github.com/falc0n-researcher/depfuse-oss/internal/inventory"
 	"github.com/falc0n-researcher/depfuse-oss/internal/match"
 	"github.com/falc0n-researcher/depfuse-oss/internal/remediation"
 	"github.com/falc0n-researcher/depfuse-oss/internal/report"
@@ -15,6 +16,19 @@ import (
 	"github.com/falc0n-researcher/depfuse-oss/internal/verdict"
 	"github.com/falc0n-researcher/depfuse-oss/pkg/models"
 )
+
+// snapshotModeFor reports which OSV/intel index served this scan: the live
+// online API, a full offline `depfuse collect` database, or the embedded
+// weaponized-only snapshot bundled with the binary.
+func snapshotModeFor(store *intel.Store, opts Options) string {
+	if !opts.Offline {
+		return resolve.SnapshotModeOnline
+	}
+	if store != nil && store.IsWeaponizedOnly() {
+		return resolve.SnapshotModeEmbeddedSnapshot
+	}
+	return resolve.SnapshotModeFullOfflineDB
+}
 
 func (r *Runner) classifyAndVerdict(store *intel.Store, componentMatches []match.ComponentMatch, opts Options) ([]models.Finding, error) {
 	classifier := &classify.Classifier{Store: store}
@@ -101,23 +115,33 @@ func buildResult(store *intel.Store, root string, opts Options, components []mod
 		}
 	}
 	if opts.Package == "" && opts.RepoURL == "" {
-		meta.Coverage = resolve.ComputeCoverage(root, components, tree)
+		invTree := inventory.BuildTree(components, active)
+		meta.Coverage = resolve.ComputeCoverage(root, components, tree, invTree.Stats.Orphan, snapshotModeFor(store, opts))
 	}
 	return models.ScanResult{
-		Meta:       meta,
-		Summary:    report.Summarize(active),
-		Findings:   active,
-		Suppressed: suppressed,
-		Accepted:   accepted,
-		Components: components,
+		SchemaVersion: models.CurrentSchemaVersion,
+		Meta:          meta,
+		Summary:       report.Summarize(active),
+		Findings:      active,
+		Suppressed:    suppressed,
+		Accepted:      accepted,
+		Components:    components,
+		Unresolved:    resolve.UnresolvedComponents(components),
 	}
 }
 
 func scanExitCode(opts Options, result models.ScanResult, active, suppressed []models.Finding) int {
+	cov := result.Meta.Coverage
 	// Incomplete lockfile coverage always fails — a partial scan must not look like success.
-	if cov := result.Meta.Coverage; cov != nil && cov.IsIncomplete() {
+	if cov != nil && cov.IsIncomplete() {
 		if os.Getenv("GITHUB_ACTIONS") == "true" {
 			fmt.Fprintf(os.Stdout, "::error title=Depfuse scan incomplete::%s\n", cov.Message)
+		}
+		return 1
+	}
+	if opts.FailOnCoverageWarning && cov != nil && cov.Status == resolve.CoveragePartial {
+		if os.Getenv("GITHUB_ACTIONS") == "true" {
+			fmt.Fprintf(os.Stdout, "::warning title=Depfuse coverage warning::%s\n", cov.Message)
 		}
 		return 1
 	}

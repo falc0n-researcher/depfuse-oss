@@ -55,13 +55,14 @@ func ParseBun(manifestPath string, deps ManifestDeps, lockPath string) ([]models
 		}
 		direct := deps.Prod[name] || deps.Dev[name]
 		out = append(out, models.Component{
-			Name:     name,
-			Version:  version,
-			PURL:     purl.NPM(name, version),
-			Scope:    scope,
-			Direct:   direct,
-			Path:     []string{name},
-			Manifest: manifestPath,
+			Name:           name,
+			Version:        version,
+			PURL:           purl.NPM(name, version),
+			Scope:          scope,
+			Direct:         direct,
+			Path:           []string{name},
+			Manifest:       manifestPath,
+			PathConfidence: PathConfidenceLow,
 		})
 	}
 	return out, nil

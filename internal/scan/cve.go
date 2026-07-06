@@ -69,6 +69,7 @@ func (r *Runner) RunCVE(ctx context.Context, cveID string, opts Options) (models
 
 	hash, _ := store.Hash()
 	result := models.ScanResult{
+		SchemaVersion: models.CurrentSchemaVersion,
 		Meta: models.ScanMeta{
 			Timestamp:       time.Now().UTC(),
 			SnapshotVersion: store.Version(),

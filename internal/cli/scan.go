@@ -11,24 +11,25 @@ import (
 )
 
 type scanOpts struct {
-	Path           string
-	RepoURL        string
-	RepoRef        string
-	Package        string
-	DBPath         string
-	Offline        bool
-	Format         string
-	OutDir         string
-	CI             bool
-	FailOn         string
-	Quiet          bool
-	Verbose        bool
-	ShowSuppressed bool
-	Delta          bool
-	NoHistory      bool
-	TreeDepth      int
-	IncludeDev     bool
-	ShowTree       bool // expand full nested shadow dep tree in CLI output
+	Path                  string
+	RepoURL               string
+	RepoRef               string
+	Package               string
+	DBPath                string
+	Offline               bool
+	Format                string
+	OutDir                string
+	CI                    bool
+	FailOn                string
+	Quiet                 bool
+	Verbose               bool
+	ShowSuppressed        bool
+	Delta                 bool
+	NoHistory             bool
+	TreeDepth             int
+	IncludeDev            bool
+	ShowTree              bool // expand full nested shadow dep tree in CLI output
+	FailOnCoverageWarning bool
 }
 
 func (o scanOpts) toScanOptions() scan.Options {
@@ -38,6 +39,7 @@ func (o scanOpts) toScanOptions() scan.Options {
 		CI: o.CI, FailOn: o.FailOn, Quiet: o.Quiet, Verbose: o.Verbose,
 		ShowSuppressed: o.ShowSuppressed, Delta: o.Delta, NoHistory: o.NoHistory,
 		TreeDepth: o.TreeDepth, IncludeDev: o.IncludeDev, ShowTree: o.ShowTree,
+		FailOnCoverageWarning: o.FailOnCoverageWarning,
 	}
 }
 

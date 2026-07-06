@@ -40,6 +40,54 @@ func TestFetchLatestVersionScoped(t *testing.T) {
 	require.Equal(t, "19.0.0", ver)
 }
 
+func TestFetchVersionsScopedNotFoundIsPrivateRegistry(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer srv.Close()
+
+	resolve.SetNPMRegistryURLForTest(srv.URL)
+	t.Cleanup(func() { resolve.SetNPMRegistryURLForTest("https://registry.npmjs.org") })
+
+	_, err := resolve.FetchVersions(context.Background(), "@company/internal-auth")
+	require.Error(t, err)
+	var re *resolve.RegistryError
+	require.ErrorAs(t, err, &re)
+	require.Equal(t, resolve.ReasonPrivateRegistry, re.Reason)
+}
+
+func TestFetchVersionsUnscopedNotFound(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer srv.Close()
+
+	resolve.SetNPMRegistryURLForTest(srv.URL)
+	t.Cleanup(func() { resolve.SetNPMRegistryURLForTest("https://registry.npmjs.org") })
+
+	_, err := resolve.FetchVersions(context.Background(), "totally-made-up-package")
+	require.Error(t, err)
+	var re *resolve.RegistryError
+	require.ErrorAs(t, err, &re)
+	require.Equal(t, resolve.ReasonNotFound, re.Reason)
+}
+
+func TestFetchVersionsAuthRequired(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
+	}))
+	defer srv.Close()
+
+	resolve.SetNPMRegistryURLForTest(srv.URL)
+	t.Cleanup(func() { resolve.SetNPMRegistryURLForTest("https://registry.npmjs.org") })
+
+	_, err := resolve.FetchVersions(context.Background(), "@company/payment-sdk")
+	require.Error(t, err)
+	var re *resolve.RegistryError
+	require.ErrorAs(t, err, &re)
+	require.Equal(t, resolve.ReasonAuthRequired, re.Reason)
+}
+
 func TestResolvePackageLatest(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`{"version":"4.17.21"}`))

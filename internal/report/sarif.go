@@ -16,8 +16,9 @@ type sarifLog struct {
 }
 
 type sarifRun struct {
-	Tool    sarifTool     `json:"tool"`
-	Results []sarifResult `json:"results"`
+	Tool       sarifTool         `json:"tool"`
+	Results    []sarifResult     `json:"results"`
+	Properties map[string]string `json:"properties,omitempty"`
 }
 
 type sarifTool struct {
@@ -147,13 +148,32 @@ func RenderSARIF(w io.Writer, result models.ScanResult, toolVersion string) erro
 					Rules:   ruleList,
 				},
 			},
-			Results: results,
+			Results:    results,
+			Properties: coverageProperties(result.Meta.Coverage),
 		}},
 	}
 
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
 	return enc.Encode(log)
+}
+
+// coverageProperties surfaces scan coverage on the SARIF run so a viewer
+// doesn't mistake a clean results list for complete coverage.
+func coverageProperties(cov *models.ScanCoverageMeta) map[string]string {
+	if cov == nil {
+		return nil
+	}
+	props := map[string]string{
+		"coverageStatus":      cov.Status,
+		"coverageMessage":     cov.Message,
+		"unresolvedCount":     fmt.Sprintf("%d", cov.UnresolvedCount),
+		"peerDependencyCount": fmt.Sprintf("%d", cov.PeerDependencyCount),
+	}
+	if cov.SnapshotMode != "" {
+		props["snapshotMode"] = cov.SnapshotMode
+	}
+	return props
 }
 
 func canonicalRuleID(f models.Finding) string {

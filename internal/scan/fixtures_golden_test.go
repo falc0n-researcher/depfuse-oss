@@ -53,7 +53,7 @@ func TestGoldenScanExpressApp(t *testing.T) {
 	require.GreaterOrEqual(t, result.Meta.ComponentCount, 4)
 	require.GreaterOrEqual(t, result.Summary.Total, 8)
 	require.Equal(t, 0, result.Summary.FixNow)
-	require.Equal(t, 0, result.Summary.Exploitable())
+	require.Equal(t, 0, result.Summary.WeaponizedExposure())
 	require.Equal(t, result.Summary.Total, result.Summary.OK)
 
 	var qsTransitive *models.Finding

@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/falc0n-researcher/depfuse-oss/internal/cidoctor"
 	"github.com/falc0n-researcher/depfuse-oss/internal/cli/ui"
 	"github.com/falc0n-researcher/depfuse-oss/internal/decisions"
 	"github.com/falc0n-researcher/depfuse-oss/internal/intel"
@@ -128,10 +129,49 @@ func runDoctorCI(w io.Writer, dbPath string) (int, error) {
 	}
 	if problems > 0 {
 		fmt.Fprintf(w, "\n  %s\n\n", ui.Danger(w, fmt.Sprintf("%d CI issue(s) — see docs/arsenal/operator-sheet.md", problems)))
+	} else {
+		fmt.Fprintf(w, "    %s CI intel setup looks pinned and deterministic\n\n", ui.Dim(w, "●"))
+	}
+
+	workflowProblems, err := runWorkflowHardeningCheck(w, ".")
+	if err != nil {
+		return 1, err
+	}
+	if problems > 0 || workflowProblems > 0 {
 		return 1, nil
 	}
-	fmt.Fprintf(w, "    %s CI intel setup looks pinned and deterministic\n\n", ui.Dim(w, "●"))
 	return 0, nil
+}
+
+// runWorkflowHardeningCheck lints .github/workflows/*.yml for supply-chain
+// hardening gaps — kept as its own section, separate from CVE findings and
+// from the intel-db determinism checks above. Only HIGH severity findings
+// affect the exit code; MEDIUM/LOW are printed as advisories.
+func runWorkflowHardeningCheck(w io.Writer, root string) (int, error) {
+	fmt.Fprintf(w, "  %s\n\n", ui.Bold(w, "Workflow hardening (.github/workflows)"))
+	findings, err := cidoctor.LintDir(root)
+	if err != nil {
+		return 0, err
+	}
+	if len(findings) == 0 {
+		fmt.Fprintf(w, "    %s no workflow hardening gaps found\n\n", ui.Dim(w, "●"))
+		return 0, nil
+	}
+	problems := 0
+	for _, f := range findings {
+		marker := ui.Dim(w, "○")
+		switch f.Severity {
+		case cidoctor.SeverityHigh:
+			marker = ui.Danger(w, "✗")
+			problems++
+		case cidoctor.SeverityMedium:
+			marker = ui.Dim(w, "●")
+		}
+		fmt.Fprintf(w, "    %s %s  %s\n", marker, ui.Dim(w, "["+f.File+"]"), f.Message)
+		fmt.Fprintf(w, "        %s\n", ui.Dim(w, f.Recommendation))
+	}
+	fmt.Fprintln(w)
+	return problems, nil
 }
 
 func formatAge(d time.Duration) string {

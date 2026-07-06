@@ -50,7 +50,7 @@ func (c *Classifier) Classify(cve models.CveMatch) (models.Classification, error
 			}
 			evidence = append(evidence, cite(a, claim))
 		case models.SourceVulnCheckXDB:
-			evidence = append(evidence, cite(a, "VulnCheck XDB indexes validated proof-of-concept exploit code (metadata only)"))
+			evidence = append(evidence, cite(a, "VulnCheck XDB indexes validated proof-of-concept exploit code — citation only, does not affect priority tier"))
 		case models.SourceNuclei:
 			signals.Nuclei = true
 			evidence = append(evidence, cite(a, "Nuclei scanner template exists for this CVE"))

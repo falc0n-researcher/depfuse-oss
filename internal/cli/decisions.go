@@ -32,6 +32,7 @@ func newDecisionsCmd(flags *globalFlags) *cobra.Command {
 	cmd.AddCommand(newDecisionsListCmd(flags, &projectPath))
 	cmd.AddCommand(newDecisionsRecordCmd(flags, &projectPath))
 	cmd.AddCommand(newDecisionsExportCmd(flags, &projectPath))
+	cmd.AddCommand(newDecisionsExplainCmd(flags, &projectPath))
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		return renderDecisionsList(flags, projectPath)
@@ -87,6 +88,28 @@ func newDecisionsRecordCmd(flags *globalFlags, projectPath *string) *cobra.Comma
 	_ = cmd.MarkFlagRequired("as")
 	_ = cmd.MarkFlagRequired("reason")
 	return cmd
+}
+
+func newDecisionsExplainCmd(flags *globalFlags, projectPath *string) *cobra.Command {
+	return &cobra.Command{
+		Use:   "explain CVE-ID",
+		Short: "Show a stored decision's history vs current evidence, and reopen status",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			runner := &scan.Runner{}
+			explains, err := runner.RunDecisionsExplain(cmd.Context(), args[0], *projectPath, intel.ResolvedPath(), intel.OfflineFromEnv())
+			if err != nil {
+				return err
+			}
+			if flags.format == "json" {
+				enc := json.NewEncoder(os.Stdout)
+				enc.SetIndent("", "  ")
+				return enc.Encode(explains)
+			}
+			ui.RenderDecisionExplain(os.Stdout, explains)
+			return nil
+		},
+	}
 }
 
 func newDecisionsExportCmd(flags *globalFlags, projectPath *string) *cobra.Command {

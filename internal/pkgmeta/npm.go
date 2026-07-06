@@ -42,6 +42,28 @@ type registryDoc struct {
 	Description string `json:"description"`
 	License     any    `json:"license"`
 	Homepage    string `json:"homepage"`
+	DistTags    struct {
+		Latest string `json:"latest"`
+	} `json:"dist-tags"`
+	Versions map[string]struct {
+		Scripts map[string]string `json:"scripts"`
+	} `json:"versions"`
+}
+
+// lifecycleHooks are the npm install-time script hooks worth surfacing as
+// supply-chain context. See https://docs.npmjs.com/cli/using-npm/scripts.
+var lifecycleHooks = []string{"preinstall", "install", "postinstall", "prepare"}
+
+// lifecycleScriptNames returns which lifecycleHooks are present in scripts,
+// preserving hook order.
+func lifecycleScriptNames(scripts map[string]string) []string {
+	var out []string
+	for _, hook := range lifecycleHooks {
+		if _, ok := scripts[hook]; ok {
+			out = append(out, hook)
+		}
+	}
+	return out
 }
 
 type downloadPoint struct {
@@ -49,37 +71,42 @@ type downloadPoint struct {
 	Downloads int64  `json:"downloads"`
 }
 
-// FetchRegistry fetches package description, license, and homepage from npm.
-func FetchRegistry(ctx context.Context, name string) (description, license, homepage string, err error) {
+// FetchRegistry fetches package description, license, homepage, and
+// install-time lifecycle script hooks (from the latest published version)
+// from npm.
+func FetchRegistry(ctx context.Context, name string) (description, license, homepage string, lifecycleScripts []string, err error) {
 	name = strings.TrimSpace(name)
 	if name == "" {
-		return "", "", "", fmt.Errorf("package name required")
+		return "", "", "", nil, fmt.Errorf("package name required")
 	}
 	reqURL := fmt.Sprintf("%s/%s", strings.TrimSuffix(registryBase, "/"), registryPath(name))
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", nil, err
 	}
 	req.Header.Set("Accept", "application/json")
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode == http.StatusNotFound {
-		return "", "", "", fmt.Errorf("package %q not found on npm", name)
+		return "", "", "", nil, fmt.Errorf("package %q not found on npm", name)
 	}
 	if resp.StatusCode >= 400 {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 256))
-		return "", "", "", fmt.Errorf("npm registry http %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+		return "", "", "", nil, fmt.Errorf("npm registry http %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
 	}
 
 	var doc registryDoc
 	if err := json.NewDecoder(resp.Body).Decode(&doc); err != nil {
-		return "", "", "", fmt.Errorf("decode npm registry: %w", err)
+		return "", "", "", nil, fmt.Errorf("decode npm registry: %w", err)
 	}
-	return strings.TrimSpace(doc.Description), formatLicense(doc.License), strings.TrimSpace(doc.Homepage), nil
+	if latest, ok := doc.Versions[doc.DistTags.Latest]; ok {
+		lifecycleScripts = lifecycleScriptNames(latest.Scripts)
+	}
+	return strings.TrimSpace(doc.Description), formatLicense(doc.License), strings.TrimSpace(doc.Homepage), lifecycleScripts, nil
 }
 
 // FetchWeeklyDownloads returns last-week download counts for each package name.

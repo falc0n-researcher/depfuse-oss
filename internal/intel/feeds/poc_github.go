@@ -62,7 +62,8 @@ func (f *PoCGitHub) Fetch(ctx context.Context, runID string) ([]intel.Normalized
 			}
 			seen[key] = true
 			maturity := models.MaturityHasCode
-			if repo.Stars >= 10 {
+			signals := pocSignalCount(repo, cve)
+			if !repo.Fork && signals >= 2 {
 				maturity = models.MaturityVerified
 			}
 			out = append(out, intel.NormalizedRecord{
@@ -94,17 +95,48 @@ func (f *PoCGitHub) Fetch(ctx context.Context, runID string) ([]intel.Normalized
 }
 
 type ghRepo struct {
-	FullName string
-	HTMLURL  string
-	Stars    int
+	FullName    string
+	HTMLURL     string
+	Description string
+	Stars       int
+	Fork        bool
+	CreatedAt   time.Time
 }
 
 type ghSearchResponse struct {
 	Items []struct {
-		FullName string `json:"full_name"`
-		HTMLURL  string `json:"html_url"`
-		Stars    int    `json:"stargazers_count"`
+		FullName    string `json:"full_name"`
+		HTMLURL     string `json:"html_url"`
+		Description string `json:"description"`
+		Stars       int    `json:"stargazers_count"`
+		Fork        bool   `json:"fork"`
+		CreatedAt   string `json:"created_at"`
 	} `json:"items"`
+}
+
+// pocSignalCount corroborates a PoC repo's relevance to cve beyond raw star
+// count — a starred repo alone is not evidence the code targets this specific
+// vulnerability. Forks are excluded entirely by the caller (a mirror adds no
+// independent corroboration). Verified status requires >= 2 of:
+//   - the CVE id appears verbatim in the repo name or description (the author
+//     is explicitly claiming this exploit, not an incidental keyword match)
+//   - community attention (stars >= 10)
+//   - the repo has a real description at all (distinguishes genuine writeups
+//     from empty scraped/spam repos that only matched on README content)
+func pocSignalCount(repo ghRepo, cve string) int {
+	score := 0
+	lowerCVE := strings.ToLower(cve)
+	if strings.Contains(strings.ToLower(repo.FullName), lowerCVE) ||
+		strings.Contains(strings.ToLower(repo.Description), lowerCVE) {
+		score++
+	}
+	if repo.Stars >= 10 {
+		score++
+	}
+	if strings.TrimSpace(repo.Description) != "" {
+		score++
+	}
+	return score
 }
 
 func searchGitHubPoC(ctx context.Context, client *http.Client, token, cve string) ([]ghRepo, error) {
@@ -138,7 +170,11 @@ func searchGitHubPoC(ctx context.Context, client *http.Client, token, cve string
 		if item.FullName == "" {
 			continue
 		}
-		out = append(out, ghRepo{FullName: item.FullName, HTMLURL: item.HTMLURL, Stars: item.Stars})
+		createdAt, _ := time.Parse(time.RFC3339, item.CreatedAt)
+		out = append(out, ghRepo{
+			FullName: item.FullName, HTMLURL: item.HTMLURL, Description: item.Description,
+			Stars: item.Stars, Fork: item.Fork, CreatedAt: createdAt,
+		})
 	}
 	return out, nil
 }

@@ -17,6 +17,18 @@ type ManifestDeps struct {
 	Specs map[string]string // name -> raw version spec (range or exact)
 }
 
+// PathConfidence values for models.Component.PathConfidence.
+const (
+	// PathConfidenceExact means Path reflects the true dependency chain,
+	// reconstructed from a lockfile format with recorded parent/child edges
+	// (npm package-lock v1/v2/v3).
+	PathConfidenceExact = "exact"
+	// PathConfidenceLow means the lockfile format only yields a flat,
+	// unranked package list (yarn, pnpm, bun) — Path is just [Name], not a
+	// verified dependency chain.
+	PathConfidenceLow = "low"
+)
+
 // LoadManifestDeps reads package.json dependency sections.
 func LoadManifestDeps(manifestPath string) (ManifestDeps, error) {
 	data, err := os.ReadFile(manifestPath)
@@ -148,13 +160,14 @@ func parseNPMPackages(manifestPath string, packages map[string]npmLockPackage, d
 			chain = []string{name}
 		}
 		out = append(out, models.Component{
-			Name:     name,
-			Version:  pkg.Version,
-			PURL:     purl.NPM(name, pkg.Version),
-			Scope:    scope,
-			Direct:   direct,
-			Path:     chain,
-			Manifest: manifestPath,
+			Name:           name,
+			Version:        pkg.Version,
+			PURL:           purl.NPM(name, pkg.Version),
+			Scope:          scope,
+			Direct:         direct,
+			Path:           chain,
+			Manifest:       manifestPath,
+			PathConfidence: PathConfidenceExact,
 		})
 	}
 	return out, nil
@@ -228,13 +241,14 @@ func parseNPMLegacy(manifestPath string, rootDeps map[string]npmLockDep, deps Ma
 		direct := deps.Prod[name] || deps.Dev[name]
 		path := append(append([]string(nil), chain...), name)
 		out = append(out, models.Component{
-			Name:     name,
-			Version:  dep.Version,
-			PURL:     purl.NPM(name, dep.Version),
-			Scope:    scope,
-			Direct:   direct,
-			Path:     path,
-			Manifest: manifestPath,
+			Name:           name,
+			Version:        dep.Version,
+			PURL:           purl.NPM(name, dep.Version),
+			Scope:          scope,
+			Direct:         direct,
+			Path:           path,
+			Manifest:       manifestPath,
+			PathConfidence: PathConfidenceExact,
 		})
 		for childName, childDep := range dep.Dependencies {
 			walk(childName, childDep, scope == models.ScopeDev, path)
@@ -291,13 +305,14 @@ func ParseYarn(manifestPath string, deps ManifestDeps, lockPath string) ([]model
 		}
 		direct := deps.Prod[name] || deps.Dev[name]
 		out = append(out, models.Component{
-			Name:     name,
-			Version:  version,
-			PURL:     purl.NPM(name, version),
-			Scope:    scope,
-			Direct:   direct,
-			Path:     []string{name},
-			Manifest: manifestPath,
+			Name:           name,
+			Version:        version,
+			PURL:           purl.NPM(name, version),
+			Scope:          scope,
+			Direct:         direct,
+			Path:           []string{name},
+			Manifest:       manifestPath,
+			PathConfidence: PathConfidenceLow,
 		})
 	}
 	return out, nil
@@ -350,13 +365,14 @@ func ParsePNPM(manifestPath string, deps ManifestDeps, lockPath string) ([]model
 		}
 		direct := deps.Prod[name] || deps.Dev[name]
 		out = append(out, models.Component{
-			Name:     name,
-			Version:  version,
-			PURL:     purl.NPM(name, version),
-			Scope:    scope,
-			Direct:   direct,
-			Path:     []string{name},
-			Manifest: manifestPath,
+			Name:           name,
+			Version:        version,
+			PURL:           purl.NPM(name, version),
+			Scope:          scope,
+			Direct:         direct,
+			Path:           []string{name},
+			Manifest:       manifestPath,
+			PathConfidence: PathConfidenceLow,
 		})
 	}
 	return out, nil
@@ -377,8 +393,8 @@ func parsePNPMPackages(content string) map[string]string {
 				break
 			}
 		}
-		if inPackages && strings.HasPrefix(line, "  /") {
-			entry := strings.TrimSpace(strings.TrimSuffix(trimmed, ":"))
+		if inPackages && isPNPMPackageKeyLine(line, trimmed) {
+			entry := strings.TrimSuffix(trimmed, ":")
 			entry = strings.TrimPrefix(entry, "/")
 			at := strings.LastIndex(entry, "@")
 			if at <= 0 {
@@ -393,4 +409,20 @@ func parsePNPMPackages(content string) map[string]string {
 		}
 	}
 	return out
+}
+
+// isPNPMPackageKeyLine reports whether line is a top-level entry under
+// packages: (exactly 2-space indent — nested metadata like "resolution:" or
+// "engines:" is indented 4+). lockfileVersion 6 prefixes keys with "/" (e.g.
+// "  /lodash@4.17.21:"); lockfileVersion 9 dropped the leading slash (e.g.
+// "  lodash@4.17.21:"), so both are accepted here.
+func isPNPMPackageKeyLine(line, trimmed string) bool {
+	if !strings.HasPrefix(line, "  ") || strings.HasPrefix(line, "   ") {
+		return false
+	}
+	if !strings.HasSuffix(trimmed, ":") {
+		return false
+	}
+	key := strings.TrimPrefix(trimmed, "/")
+	return strings.Contains(key, "@")
 }

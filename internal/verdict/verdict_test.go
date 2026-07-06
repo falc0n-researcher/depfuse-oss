@@ -45,3 +45,28 @@ func TestCIFailProdOnly(t *testing.T) {
 	require.True(t, verdict.ShouldFailCI(models.Component{Scope: models.ScopeProd}, models.PriorityP1, fail))
 	require.False(t, verdict.ShouldFailCI(models.Component{Scope: models.ScopeDev}, models.PriorityP1, fail))
 }
+
+func TestComputeP3IsWatchNotOK(t *testing.T) {
+	comp := models.Component{Name: "lodash", Version: "4.17.20", Scope: models.ScopeProd}
+	v, reason := verdict.Compute(comp, models.PriorityP3, models.ConfidenceMedium)
+	require.Equal(t, models.VerdictWatch, v)
+	require.NotEqual(t, models.VerdictOK, v)
+	require.Contains(t, reason, "watch")
+	require.False(t, v.IsAction(), "WATCH must not fail CI by default")
+}
+
+func TestComputeP4IsStillOK(t *testing.T) {
+	comp := models.Component{Name: "lodash", Version: "4.17.20", Scope: models.ScopeProd}
+	v, _ := verdict.Compute(comp, models.PriorityP4, models.ConfidenceMedium)
+	require.Equal(t, models.VerdictOK, v)
+}
+
+func TestParseFailTiersAcceptsWatchAlias(t *testing.T) {
+	fail := verdict.ParseFailTiers("p0,p1,watch")
+	require.True(t, fail[models.PriorityP0])
+	require.True(t, fail[models.PriorityP1])
+	require.True(t, fail[models.PriorityP3])
+
+	fail = verdict.ParseFailTiers("p3")
+	require.True(t, fail[models.PriorityP3])
+}

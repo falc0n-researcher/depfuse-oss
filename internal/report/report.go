@@ -106,8 +106,8 @@ func renderCLILegacy(w ioWriter, result models.ScanResult) {
 	fmt.Fprintf(w, " Snapshot: %s (%s)\n", result.Meta.SnapshotVersion, result.Meta.SnapshotHash)
 	fmt.Fprintf(w, " Components: %d | Findings: %d | %dms\n\n",
 		result.Meta.ComponentCount, result.Meta.FindingCount, result.Meta.DurationMS)
-	fmt.Fprintf(w, " Summary: %d exploitable (P0/P1), %d backlog (P3/P4)\n",
-		result.Summary.Exploitable(), result.Summary.Backlog())
+	fmt.Fprintf(w, " Summary: %d weaponized exposure (P0/P1), %d backlog (P3/P4)\n",
+		result.Summary.WeaponizedExposure(), result.Summary.Backlog())
 	fmt.Fprintf(w, " Actions: FIX NOW=%d  FIX SOON=%d  OK=%d\n\n",
 		result.Summary.FixNow, result.Summary.FixSoon, result.Summary.OK)
 
@@ -149,7 +149,7 @@ func RenderMarkdown(path string, result models.ScanResult) error {
 	b.WriteString(fmt.Sprintf("- **Scanned:** %s\n", result.Meta.Timestamp.Format(time.RFC3339)))
 	b.WriteString(fmt.Sprintf("- **Input:** %s\n", result.Meta.InputPath))
 	b.WriteString(fmt.Sprintf("- **Snapshot:** %s (`%s`)\n", result.Meta.SnapshotVersion, result.Meta.SnapshotHash))
-	b.WriteString(fmt.Sprintf("- **Summary:** %d exploitable, %d backlog\n\n", result.Summary.Exploitable(), result.Summary.Backlog()))
+	b.WriteString(fmt.Sprintf("- **Summary:** %d weaponized exposure, %d backlog\n\n", result.Summary.WeaponizedExposure(), result.Summary.Backlog()))
 
 	for _, f := range result.Findings {
 		if f.Classification.Priority > models.PriorityP2 {

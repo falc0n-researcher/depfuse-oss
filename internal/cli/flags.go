@@ -33,13 +33,14 @@ func (f *globalFlags) baseOpts() scanOpts {
 
 // scanCommandFlags are scan-only options (global flags are read at RunE time).
 type scanCommandFlags struct {
-	OutDir         string
-	CI             bool
-	FailOn         string
-	ShowSuppressed bool
-	Delta          bool
-	NoHistory      bool
-	ShowTree       bool
+	OutDir                string
+	CI                    bool
+	FailOn                string
+	ShowSuppressed        bool
+	Delta                 bool
+	NoHistory             bool
+	ShowTree              bool
+	FailOnCoverageWarning bool
 }
 
 // treeCommandFlags control registry dependency-tree resolution.
@@ -62,6 +63,7 @@ func (f *globalFlags) mergedScanOpts(local scanCommandFlags) scanOpts {
 	o.Delta = local.Delta
 	o.NoHistory = local.NoHistory
 	o.ShowTree = local.ShowTree
+	o.FailOnCoverageWarning = local.FailOnCoverageWarning
 	return o
 }
 
@@ -84,4 +86,5 @@ func bindScanFlags(cmd *cobra.Command, local *scanCommandFlags) {
 	cmd.Flags().BoolVar(&local.Delta, "delta", false, "Show changes since last scan (prefer: depfuse watch)")
 	_ = cmd.Flags().MarkDeprecated("delta", "use `depfuse watch` for decision memory")
 	cmd.Flags().BoolVar(&local.NoHistory, "no-history", false, "Skip scan history persistence")
+	cmd.Flags().BoolVar(&local.FailOnCoverageWarning, "fail-on-coverage-warning", false, "Also exit 1 on partial coverage (e.g. embedded weaponized-only snapshot, registry-resolved-not-lockfile-pinned tree)")
 }

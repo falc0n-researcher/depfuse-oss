@@ -41,6 +41,11 @@ type Options struct {
 	TreeDepth      int  // 0 = full tree; 1 = root/direct only
 	IncludeDev     bool // walk devDependencies in registry trees
 	ShowTree       bool // expand full nested shadow dep tree in CLI output
+
+	// FailOnCoverageWarning also exits 1 on partial coverage (embedded
+	// weaponized-only snapshot, registry-resolved-not-lockfile-pinned tree),
+	// not just on incomplete coverage (which always exits 1).
+	FailOnCoverageWarning bool
 }
 
 // Runner executes the full scan pipeline.

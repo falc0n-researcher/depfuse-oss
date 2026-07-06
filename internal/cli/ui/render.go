@@ -166,6 +166,7 @@ func RenderScan(w io.Writer, result models.ScanResult) {
 		MetaLine(w, "Reopened", fmt.Sprintf("%d decisions need review", result.Meta.ReopenedCount))
 	}
 	renderCoverageBanner(w, result.Meta.Coverage)
+	renderUnresolvedSection(w, result.Unresolved)
 
 	renderSummary(w, result.Summary)
 
@@ -199,7 +200,7 @@ func RenderScan(w io.Writer, result models.ScanResult) {
 			renderActionEvidenceTable(w, actionItems)
 		}
 		if hasWeaponized(actionItems) {
-			fmt.Fprintf(w, "  %s\n", Dim(w, "Exploit signals describe the CVE, not proof it is reachable in your app (v0.1)."))
+			fmt.Fprintf(w, "  %s\n", Dim(w, "Exploit signals describe the CVE, not proof it is reachable in your app."))
 		}
 		if result.Verbose {
 			renderVerboseBriefings(w, actionItems)
@@ -267,7 +268,7 @@ func renderCVEScan(w io.Writer, result models.ScanResult) {
 			renderActionEvidenceTable(w, actionItems)
 		}
 		if hasWeaponized(actionItems) {
-			fmt.Fprintf(w, "  %s\n", Dim(w, "Exploit signals describe the CVE, not proof it is reachable in your app (v0.1)."))
+			fmt.Fprintf(w, "  %s\n", Dim(w, "Exploit signals describe the CVE, not proof it is reachable in your app."))
 		}
 	}
 
@@ -500,15 +501,15 @@ func renderSummary(w io.Writer, s models.ScanSummary) {
 	if total == 0 {
 		total = 1
 	}
-	exploitablePct := float64(s.Exploitable()) / float64(total)
+	weaponizedPct := float64(s.WeaponizedExposure()) / float64(total)
 	fixNowPct := float64(s.FixNow) / float64(total)
 	okPct := float64(s.OK) / float64(total)
 
 	Table{
-		Headers: []string{"Exploitable", "Fix Now", "Fix Soon", "OK", "Backlog"},
+		Headers: []string{"Weaponized Exposure", "Fix Now", "Fix Soon", "OK", "Backlog"},
 		Align:   []Align{AlignRight, AlignRight, AlignRight, AlignRight, AlignRight},
 		Rows: [][]string{{
-			Bold(w, fmt.Sprintf("%d", s.Exploitable())),
+			Bold(w, fmt.Sprintf("%d", s.WeaponizedExposure())),
 			Bold(w, fmt.Sprintf("%d", s.FixNow)),
 			fmt.Sprintf("%d", s.FixSoon),
 			fmt.Sprintf("%d", s.OK),
@@ -521,11 +522,11 @@ func renderSummary(w io.Writer, s models.ScanSummary) {
 			s.P0, s.P1, s.P2, s.P3, s.P4))
 	}
 
-	renderRatioBar(w, "Exploitable", exploitablePct, s.Exploitable(), total, orange)
+	renderRatioBar(w, "Weaponized Exposure", weaponizedPct, s.WeaponizedExposure(), total, orange)
 	renderRatioBar(w, "Fix Now", fixNowPct, s.FixNow, total, red)
 	renderRatioBar(w, "OK", okPct, s.OK, total, green)
 
-	if s.Total > 0 && s.Exploitable() == 0 && s.FixSoon == 0 && s.FixNow == 0 {
+	if s.Total > 0 && s.WeaponizedExposure() == 0 && s.FixSoon == 0 && s.FixNow == 0 {
 		fmt.Fprintf(w, "  %s\n", Dim(w, "No known exploit (P0/P1/P2) — release may proceed; review remaining advisories."))
 	}
 }
@@ -781,6 +782,38 @@ func renderCoverageBanner(w io.Writer, cov *models.ScanCoverageMeta) {
 		fmt.Fprintf(w, "  %s\n", Dim(w, "Exit code 1 — commit a lockfile for full transitive coverage."))
 	} else {
 		fmt.Fprintf(w, "  %s\n", Dim(w, cov.Message))
+	}
+	if cov.PeerDependencyCount > 0 {
+		fmt.Fprintf(w, "  %s\n", Dim(w, fmt.Sprintf(
+			"%d peer/optional dependencies detected — scanned, but not shown in the dependency-path tree", cov.PeerDependencyCount)))
+	}
+	fmt.Fprintln(w)
+}
+
+func unresolvedReasonLabel(reason string) string {
+	switch reason {
+	case "private-registry":
+		return "private registry — not published on registry.npmjs.org"
+	case "not-found":
+		return "package not found on registry.npmjs.org"
+	case "auth-required":
+		return "registry requires authentication"
+	case "offline-mode":
+		return "offline — registry not queried"
+	default:
+		return "registry lookup failed"
+	}
+}
+
+func renderUnresolvedSection(w io.Writer, unresolved []models.Component) {
+	if len(unresolved) == 0 {
+		return
+	}
+	fmt.Fprintf(w, "  %s\n", Danger(w, fmt.Sprintf("Unresolved Dependencies (%d)", len(unresolved))))
+	fmt.Fprintf(w, "  %s\n", Dim(w, "Could not be pinned to a concrete version — excluded from OSV matching, not silently skipped."))
+	for _, c := range unresolved {
+		fmt.Fprintf(w, "    %s@%s  (%s)  — %s\n",
+			c.Name, firstNonEmpty(c.Version, "*"), c.Scope, Dim(w, unresolvedReasonLabel(c.UnresolvedReason)))
 	}
 	fmt.Fprintln(w)
 }

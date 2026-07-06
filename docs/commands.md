@@ -78,8 +78,8 @@ depfuse cve CVE-2025-29927 --format json
 |---------|--------------|
 | `depfuse collect` | Build `~/.depfuse/intel.db` from all intelligence feeds |
 | `depfuse watch [path]` | Surface prior accepted-risk decisions whose evidence changed |
-| `depfuse decisions record/list` | Record and manage acceptance decisions |
-| `depfuse doctor` | Validate local setup and intel database age |
+| `depfuse decisions record/list/explain/export` | Record, list, explain (evidence then vs. now), and export decisions |
+| `depfuse doctor [--ci]` | Validate local setup, intel database age, and (with `--ci`) `.github/workflows/*.yml` supply-chain hardening |
 
 ## Output formats
 

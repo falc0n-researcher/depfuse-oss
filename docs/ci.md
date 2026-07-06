@@ -40,8 +40,10 @@ on:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Install Depfuse
         run: go install github.com/falc0n-researcher/depfuse-oss/cmd/depfuse@latest
@@ -55,6 +57,9 @@ jobs:
         run: depfuse scan . --ci --fail-on P0,P1 --format sarif --out-dir ./sarif
 ```
 
+> **Note**  
+> Third-party actions should always be pinned to a full-length commit SHA (not a tag or branch), so a tag can't be silently moved to point at different — or malicious — code. `depfuse doctor --ci` checks your `.github/workflows/*.yml` for unpinned actions, `pull_request_target`, missing `permissions:`, and npm-publish steps using a long-lived token instead of OIDC trusted publishing.
+
 ## Fail tier recommendations
 
 | Profile | `--fail-on` |
@@ -63,7 +68,7 @@ jobs:
 | Paranoid | `P0,P1,P2` |
 | Advisory only | `P0` |
 
-P3/P4 never fail CI by default.
+P3/P4 never fail CI by default. P3 (WATCH) can be added explicitly with `--fail-on P0,P1,watch`.
 
 ## Pinned intel database
 

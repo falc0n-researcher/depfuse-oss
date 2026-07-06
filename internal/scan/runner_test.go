@@ -82,7 +82,7 @@ func TestFalsePositiveCorpus(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, result.Findings)
-	require.Greater(t, result.Summary.Backlog(), result.Summary.Exploitable())
+	require.Greater(t, result.Summary.Backlog(), result.Summary.WeaponizedExposure())
 	require.Equal(t, 0, result.Summary.FixNow)
 }
 

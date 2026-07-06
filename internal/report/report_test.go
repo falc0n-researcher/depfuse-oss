@@ -42,7 +42,7 @@ func TestRankAndSummarize(t *testing.T) {
 	report.Rank(findings)
 	require.Equal(t, "A", findings[0].CveMatch.CVEID)
 	s := report.Summarize(findings)
-	require.Equal(t, 2, s.Exploitable())
+	require.Equal(t, 2, s.WeaponizedExposure())
 }
 
 func TestSummarizeBacklogExcludesT2(t *testing.T) {
@@ -52,7 +52,7 @@ func TestSummarizeBacklogExcludesT2(t *testing.T) {
 		{Classification: models.Classification{Priority: models.PriorityP4}, Verdict: models.VerdictOK},
 	}
 	s := report.Summarize(findings)
-	require.Equal(t, 0, s.Exploitable())
+	require.Equal(t, 0, s.WeaponizedExposure())
 	require.Equal(t, 1, s.FixSoon)
 	require.Equal(t, 2, s.Backlog())
 }

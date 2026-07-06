@@ -51,6 +51,16 @@ type DecisionFile struct {
 	Decisions []StoredDecision `yaml:"decisions" json:"decisions"`
 }
 
+// DecisionExplain is the `depfuse decisions explain` output for one stored
+// decision: what was decided, the evidence tier at decision time vs the
+// current re-classified tier, and whether it would reopen right now.
+type DecisionExplain struct {
+	Decision     StoredDecision `json:"decision"`
+	CurrentLevel Priority       `json:"currentLevel"`
+	WouldReopen  bool           `json:"wouldReopen"`
+	ReopenReason string         `json:"reopenReason,omitempty"`
+}
+
 // WatchItem summarizes one finding under decision memory during watch.
 type WatchItem struct {
 	CVE           string       `json:"cve"`

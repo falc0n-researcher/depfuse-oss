@@ -124,3 +124,31 @@ func RenderDecisionsList(w io.Writer, file []models.StoredDecision) {
 	tbl.Print(w)
 	fmt.Fprintln(w)
 }
+
+// RenderDecisionExplain prints stored-decision history against current
+// evidence: what was decided, the tier then vs now, and whether the reopen
+// policy would currently reopen it.
+func RenderDecisionExplain(w io.Writer, explains []models.DecisionExplain) {
+	for _, e := range explains {
+		d := e.Decision
+		fmt.Fprintf(w, "\n  %s\n\n", Bold(w, d.CVE))
+		pkg := d.Package
+		if d.Version != "" {
+			pkg += "@" + d.Version
+		}
+		if pkg != "" {
+			fmt.Fprintf(w, "  Scope            %s\n", pkg)
+		}
+		fmt.Fprintf(w, "  Decision         %s\n", d.Decision)
+		fmt.Fprintf(w, "  Reason           %s\n", d.Reason)
+		fmt.Fprintf(w, "  Decided at       %s\n", d.DecidedAt.Format("2006-01-02"))
+		fmt.Fprintf(w, "  Level then       %s\n", d.DecidedWhenLevel)
+		fmt.Fprintf(w, "  Level now        %s\n", e.CurrentLevel)
+		if e.WouldReopen {
+			fmt.Fprintf(w, "  %s %s\n", Danger(w, "Reopens:"), e.ReopenReason)
+		} else {
+			fmt.Fprintf(w, "  %s\n", Dim(w, "Still silent — no reopen trigger has fired since this decision"))
+		}
+	}
+	fmt.Fprintln(w)
+}

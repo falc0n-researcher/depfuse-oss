@@ -49,20 +49,21 @@ func Lookup(ctx context.Context, store *intel.Store, offline bool, names ...stri
 	}
 
 	for _, name := range needFetch {
-		desc, license, homepage, regErr := FetchRegistry(ctx, name)
+		desc, license, homepage, lifecycleScripts, regErr := FetchRegistry(ctx, name)
 		if regErr != nil {
 			continue
 		}
 		weekly := downloads[name]
 		ctxMeta := &models.PackageContext{
-			Name:            name,
-			Description:     desc,
-			License:         license,
-			Homepage:        homepage,
-			WeeklyDownloads: weekly,
-			Popularity:      PopularityFromWeeklyDownloads(weekly),
+			Name:             name,
+			Description:      desc,
+			License:          license,
+			Homepage:         homepage,
+			WeeklyDownloads:  weekly,
+			Popularity:       PopularityFromWeeklyDownloads(weekly),
+			LifecycleScripts: lifecycleScripts,
 		}
-		if weekly == 0 && strings.TrimSpace(desc) == "" && strings.TrimSpace(license) == "" && strings.TrimSpace(homepage) == "" {
+		if weekly == 0 && strings.TrimSpace(desc) == "" && strings.TrimSpace(license) == "" && strings.TrimSpace(homepage) == "" && len(lifecycleScripts) == 0 {
 			continue
 		}
 		out[name] = ctxMeta

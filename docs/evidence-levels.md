@@ -34,10 +34,11 @@ hero: /assets/images/hero-evidence.png
 |---------|-----------|
 | **FIX NOW** | P0 or P1 in **production** dependencies |
 | **FIX SOON** | P2 in any scope; P1 in **dev-only** dependencies |
-| **OK** | P3/P4; or P0/P1 scoped to dev-only dependencies |
+| **WATCH** | P3 (any scope) |
+| **OK** | P4; or P0/P1 scoped to dev-only dependencies |
 
 > **Note**  
-> P3 maps to **OK** in scan mode, not FIX SOON. Use `depfuse cve` for advisory-only WATCH verdicts.
+> WATCH never fails CI by default — add it explicitly with `--fail-on P0,P1,watch`. It exists so a P3 finding stays visible as "no known exploit yet, worth watching" instead of disappearing into P4 hygiene noise.
 
 ### CVE mode (`depfuse cve`)
 

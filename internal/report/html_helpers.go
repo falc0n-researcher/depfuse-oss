@@ -285,7 +285,7 @@ func writeVerdictBars(b *strings.Builder, s models.ScanSummary, total int) {
 		{"Fix Now", "bar-fix-now", s.FixNow},
 		{"Fix Soon", "bar-fix-soon", s.FixSoon},
 		{"OK", "bar-ok", s.OK},
-		{"Exploitable", "bar-exploitable", s.Exploitable()},
+		{"Weaponized Exposure", "bar-weaponized", s.WeaponizedExposure()},
 	}
 	b.WriteString(`<div class="verdict-bars">`)
 	for _, row := range rows {

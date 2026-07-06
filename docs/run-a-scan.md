@@ -65,10 +65,16 @@ If no lockfile is found, the scan is marked **SCAN INCOMPLETE** and exits with c
 
 | Column | Meaning |
 |--------|---------|
-| Exploitable | P0–P2 findings (active exploit signals) |
+| Weaponized Exposure | P0+P1 findings — dependencies with public exploit evidence (KEV, weaponized tooling, or a verified PoC). Not a claim of app-level reachability. |
 | Fix Now | Production deps requiring immediate action |
 | Fix Soon | P2 or P1 in dev-only scope |
-| OK | P3/P4 or P0/P1 scoped to dev-only production-safe cases |
+| OK | P4, or P0/P1 scoped to dev-only production-safe cases |
+
+P3 findings render as **WATCH** — visible, but not release-blocking by default (add `--fail-on P0,P1,watch` to gate on it).
+
+### Coverage and unresolved dependencies
+
+Every scan prints a coverage banner whenever coverage isn't `complete` — no lockfile, a registry-resolved (not lockfile-pinned) tree, or matching against the embedded weaponized-only snapshot instead of a full OSV index. Dependencies that couldn't be pinned to a concrete version (private registry, auth required, not found, network error, or offline mode) are never silently dropped: they're listed in an "Unresolved Dependencies" section with the specific reason, and mark the scan **SCAN INCOMPLETE**. Peer/optional dependencies are counted and noted too — they're scanned, just not shown in the dependency-path tree. Use `--fail-on-coverage-warning` to also fail CI on partial (not just incomplete) coverage.
 
 ### Evidence receipts
 
