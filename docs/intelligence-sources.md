@@ -3,7 +3,6 @@ title: Intelligence sources
 layout: default
 nav_order: 7
 permalink: /intelligence-sources/
-hero: /assets/images/hero-feeds.png
 ---
 
 <p class="lead">Depfuse ingests metadata from public exploit-intelligence feeds during <code>depfuse collect</code>. No exploit code or PoC files are downloaded or executed — only classification signals.</p>

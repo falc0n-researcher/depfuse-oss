@@ -1,58 +1,156 @@
-.site-header {
-  border-bottom: 2px solid #ff6b2c;
+// Depfuse docs theme — minimal, content-first, no stock imagery.
+:root {
+  --df-accent: #ff6b2c;
+  --df-accent-ink: #c44a17;
+  --df-ink: #1c1a19;
+  --df-muted: #5b5551;
+  --df-line: rgba(28, 26, 25, 0.1);
+  --df-surface: #fbfaf9;
+  --df-red: #d1341f;
+  --df-amber: #b3690a;
+  --df-green: #1f7a3d;
 }
 
-blockquote {
-  border-left: 4px solid #ff6b2c;
-  background: rgba(255, 107, 44, 0.08);
-  border-radius: 0 6px 6px 0;
+// ---- Header & nav ---------------------------------------------------
+.site-header {
+  border-bottom: 1px solid var(--df-line);
+}
+
+.site-title {
+  font-weight: 600;
+}
+
+.nav-list .nav-list-item .nav-list-link.active,
+.nav-list .nav-list-item .nav-list-link:hover {
+  color: var(--df-accent-ink);
+}
+
+// ---- Typography -------------------------------------------------------
+.main-content {
+  line-height: 1.65;
 }
 
 .main-content h1,
 .main-content h2 {
-  border-bottom: 1px solid rgba(255, 107, 44, 0.2);
-  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--df-line);
+  padding-bottom: 0.4em;
+  letter-spacing: -0.01em;
 }
 
-.page-hero {
-  margin: 0 0 1.75rem;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 107, 44, 0.2);
-  box-shadow: 0 4px 24px rgba(255, 107, 44, 0.08);
-}
-
-.page-hero img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 220px;
-  object-fit: cover;
+.main-content h3,
+.main-content h4 {
+  letter-spacing: -0.005em;
 }
 
 .lead {
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: #3d3d3d;
-  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--df-muted);
+  margin: 0.25rem 0 1.75rem;
+  max-width: 42rem;
 }
 
+// ---- Callouts ----------------------------------------------------------
+blockquote {
+  border-left: 3px solid var(--df-accent);
+  background: rgba(255, 107, 44, 0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 0.85rem 1.1rem;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+// ---- Card grid -----------------------------------------------------------
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1rem;
-  margin: 1.5rem 0;
+  margin: 1.75rem 0;
 }
 
 .doc-card {
-  border: 1px solid rgba(255, 107, 44, 0.2);
-  border-radius: 8px;
-  padding: 1rem 1.1rem;
-  background: rgba(255, 107, 44, 0.04);
+  position: relative;
+  border: 1px solid var(--df-line);
+  border-radius: 10px;
+  padding: 1.1rem 1.2rem;
+  background: var(--df-surface);
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.doc-card:hover {
+  border-color: rgba(255, 107, 44, 0.45);
+  box-shadow: 0 6px 20px rgba(28, 26, 25, 0.07);
+  transform: translateY(-1px);
 }
 
 .doc-card strong {
-  color: #ff6b2c;
+  color: var(--df-ink);
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.doc-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 10px 10px 0 0;
+  background: var(--df-accent);
+  opacity: 0.7;
+}
+
+// ---- Verdict badges --------------------------------------------------
+// Use inline: <span class="badge badge-fixnow">FIX NOW</span>
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.18em 0.55em;
+  border-radius: 5px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge-fixnow {
+  color: var(--df-red);
+  background: rgba(209, 52, 31, 0.1);
+}
+
+.badge-fixsoon {
+  color: var(--df-amber);
+  background: rgba(179, 105, 10, 0.12);
+}
+
+.badge-watch {
+  color: var(--df-muted);
+  background: rgba(91, 85, 81, 0.1);
+}
+
+.badge-ok {
+  color: var(--df-green);
+  background: rgba(31, 122, 61, 0.1);
+}
+
+// ---- Tables --------------------------------------------------------------
+.main-content table {
+  border: 1px solid var(--df-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.main-content table th {
+  background: var(--df-surface);
+  font-weight: 600;
+}
+
+table th,
+table td {
+  padding: 0.55rem 0.85rem;
 }

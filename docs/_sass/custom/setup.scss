@@ -1,3 +1,7 @@
-$link-color: #ff6b2c;
-$btn-primary-color: #ff6b2c;
-$nav-child-link-color: #ff6b2c;
+// Depfuse brand — accessible rust-orange for text/links/buttons.
+// The more vivid #ff6b2c lives in custom.scss as --df-accent for
+// decorative use (borders, badges, icon fills) where AA text contrast
+// doesn't apply.
+$link-color: #c44a17;
+$btn-primary-color: #c44a17;
+$nav-child-link-color: #c44a17;

@@ -3,7 +3,6 @@ title: Run a scan
 layout: default
 nav_order: 3
 permalink: /run-a-scan/
-hero: /assets/images/hero-scan.png
 ---
 
 <p class="lead">Point Depfuse at a local project directory or GitHub URL. It walks lockfiles, matches pinned versions against OSV, and returns verdicts with evidence receipts — in the terminal, JSON, SARIF, or HTML.</p>

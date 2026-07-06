@@ -3,7 +3,6 @@ title: Decision memory
 layout: default
 nav_order: 11
 permalink: /decision-memory/
-hero: /assets/images/hero-decisions.png
 ---
 
 <p class="lead">Record accepted-risk findings and get alerted when exploit evidence changes. Decisions suppress repeat noise until reopen conditions fire — keeping your backlog honest over time.</p>

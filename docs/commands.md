@@ -3,7 +3,6 @@ title: Commands
 layout: default
 nav_order: 4
 permalink: /commands/
-hero: /assets/images/hero-scan.png
 ---
 
 <p class="lead">Depfuse exposes a small CLI surface: scan projects, look up packages and CVEs, collect intelligence feeds, and track accepted-risk decisions over time.</p>

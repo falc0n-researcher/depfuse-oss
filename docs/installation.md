@@ -3,7 +3,6 @@ title: Installation
 layout: default
 nav_order: 2
 permalink: /installation/
-hero: /assets/images/hero-install.png
 ---
 
 <p class="lead">Install the Depfuse CLI with <code>go install</code> or build from source. A first scan works offline using the embedded advisory snapshot; run <code>depfuse collect</code> for full OSV coverage and fresh intelligence feeds.</p>

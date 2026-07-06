@@ -3,13 +3,12 @@ title: Introduction
 layout: default
 nav_order: 1
 permalink: /
-hero: /assets/images/hero-intro.png
 ---
 
-<p class="lead"><strong>Depfuse</strong> scans npm dependency exposure and classifies CVE matches by <strong>public exploit evidence</strong>. Instead of sorted vulnerability lists with risk scores, it produces <strong>FIX NOW / FIX SOON / OK</strong> verdicts with cited evidence receipts.</p>
+<p class="lead"><strong>Depfuse</strong> scans npm dependency exposure and classifies CVE matches by <strong>public exploit evidence</strong>. Instead of sorted vulnerability lists with risk scores, it produces <span class="badge badge-fixnow">Fix now</span> <span class="badge badge-fixsoon">Fix soon</span> <span class="badge badge-ok">OK</span> verdicts with cited evidence receipts.</p>
 
 <div class="card-grid">
-  <div class="doc-card"><strong>Actionable verdicts</strong> FIX NOW, FIX SOON, or OK — not another CVE dashboard.</div>
+  <div class="doc-card"><strong>Actionable verdicts</strong> Three states, not another CVE dashboard.</div>
   <div class="doc-card"><strong>Cited receipts</strong> Every finding links to KEV, Nuclei, Metasploit, PoC, and EPSS signals.</div>
   <div class="doc-card"><strong>Deterministic</strong> Code-driven classification — no LLM scoring or CVSS weighting.</div>
 </div>
@@ -53,13 +52,7 @@ Depfuse is also:
 * **Not multi-ecosystem** — npm only in the current version.
 * **Not LLM-generated** — verdicts and briefings are deterministic, code-driven.
 
-## Tool workflow
-
-1. **Resolve** — Walk `package.json` and lockfiles to enumerate pinned npm packages (production vs dev scope).
-2. **Match** — Query the OSV advisory database (online batch API or offline index) for each `name@version`.
-3. **Classify** — Map intelligence feed artifacts to exploit-evidence tiers **P0–P4**.
-4. **Verdict** — Apply scope-aware rules: **FIX NOW**, **FIX SOON**, **WATCH**, or **OK**.
-5. **Report** — Emit findings with cited evidence receipts, coverage/unresolved-dependency status, and optional upgrade rollup.
+Depfuse resolves lockfiles, matches versions against OSV, and classifies exploit evidence into scope-aware verdicts — see [Methodology](methodology/) for the full pipeline.
 
 ## Ecosystem support
 

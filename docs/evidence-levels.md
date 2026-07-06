@@ -3,7 +3,6 @@ title: Evidence levels
 layout: default
 nav_order: 6
 permalink: /evidence-levels/
-hero: /assets/images/hero-evidence.png
 ---
 
 <p class="lead">Depfuse maps public exploit signals to a five-tier priority ladder (<strong>P0–P4</strong>), then applies scope-aware verdict rules. CVSS is never used as an exploit signal.</p>

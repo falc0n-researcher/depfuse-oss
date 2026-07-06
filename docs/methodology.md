@@ -3,7 +3,6 @@ title: Methodology
 layout: default
 nav_order: 5
 permalink: /methodology/
-hero: /assets/images/hero-methodology.png
 ---
 
 <p class="lead">Depfuse implements a <strong>deterministic exploit-evidence pipeline</strong>. Every verdict is code-driven — no LLM classification, no CVSS-weighted risk scores.</p>
@@ -32,11 +31,11 @@ Map intelligence artifacts to tiers **P0–P4**. Key invariant: **unverified PoC
 
 | Priority | Production scope | Dev scope |
 |----------|------------------|-----------|
-| P0 | FIX NOW | OK |
-| P1 | FIX NOW | FIX SOON |
-| P2 | FIX SOON | FIX SOON |
-| P3 | WATCH | WATCH |
-| P4 | OK | OK |
+| P0 | <span class="badge badge-fixnow">Fix now</span> | <span class="badge badge-ok">OK</span> |
+| P1 | <span class="badge badge-fixnow">Fix now</span> | <span class="badge badge-fixsoon">Fix soon</span> |
+| P2 | <span class="badge badge-fixsoon">Fix soon</span> | <span class="badge badge-fixsoon">Fix soon</span> |
+| P3 | <span class="badge badge-watch">Watch</span> | <span class="badge badge-watch">Watch</span> |
+| P4 | <span class="badge badge-ok">OK</span> | <span class="badge badge-ok">OK</span> |
 
 WATCH never fails CI by default (add it explicitly with `--fail-on P0,P1,watch`) — it exists so a P3 finding is visible as "no known exploit yet, but worth watching," not indistinguishable from P4 hygiene noise.
 

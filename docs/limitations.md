@@ -3,7 +3,6 @@ title: Limitations
 layout: default
 nav_order: 9
 permalink: /limitations/
-hero: /assets/images/hero-limitations.png
 ---
 
 <p class="lead">Depfuse is explicit about what it does and does not claim. Understanding these boundaries helps you interpret scan results correctly and avoid false confidence.</p>

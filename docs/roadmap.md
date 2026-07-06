@@ -3,7 +3,6 @@ title: Roadmap
 layout: default
 nav_order: 12
 permalink: /roadmap/
-hero: /assets/images/hero-roadmap.png
 ---
 
 <p class="lead">Directions for Depfuse development — not commitments. npm exploit-evidence classification comes first; multi-ecosystem and app-context reachability follow.</p>

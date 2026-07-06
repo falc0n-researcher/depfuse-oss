@@ -3,7 +3,6 @@ title: Lockfile coverage
 layout: default
 nav_order: 8
 permalink: /lockfiles/
-hero: /assets/images/hero-scan.png
 ---
 
 <p class="lead">Depfuse resolves exact pinned versions from lockfiles to build an accurate dependency graph. Without a lockfile, scans are marked <strong>SCAN INCOMPLETE</strong> — transitive coverage cannot be guaranteed.</p>

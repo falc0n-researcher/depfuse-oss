@@ -3,7 +3,6 @@ title: CI integration
 layout: default
 nav_order: 10
 permalink: /ci/
-hero: /assets/images/hero-ci.png
 ---
 
 <p class="lead">Gate pull requests and releases on exploit evidence, not CVSS noise. Use <code>--ci --fail-on</code> to fail the pipeline when weaponized CVEs appear in production dependencies.</p>
