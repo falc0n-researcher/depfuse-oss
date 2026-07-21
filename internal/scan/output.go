@@ -23,6 +23,10 @@ func emitOutput(opts Options, result models.ScanResult) error {
 		if err := enc.Encode(result); err != nil {
 			return fmt.Errorf("encode json: %w", err)
 		}
+	case "jsonl":
+		if err := emitJSONL(os.Stdout, result); err != nil {
+			return fmt.Errorf("encode jsonl: %w", err)
+		}
 	case "html":
 		if err := report.RenderHTMLWriter(os.Stdout, result); err != nil {
 			return fmt.Errorf("encode html: %w", err)
@@ -118,4 +122,28 @@ func firstNonEmpty(vals ...string) string {
 		}
 	}
 	return ""
+}
+
+// emitJSONL writes one JSON object per line — meta first, then one line per
+// finding. Designed for piping into jq, grep, or other streaming consumers.
+func emitJSONL(w io.Writer, result models.ScanResult) error {
+	enc := json.NewEncoder(w)
+	type metaLine struct {
+		Type string             `json:"type"`
+		Meta models.ScanMeta    `json:"meta"`
+		Sum  models.ScanSummary `json:"summary"`
+	}
+	if err := enc.Encode(metaLine{Type: "meta", Meta: result.Meta, Sum: result.Summary}); err != nil {
+		return err
+	}
+	for _, f := range result.Findings {
+		type findingLine struct {
+			Type string         `json:"type"`
+			F    models.Finding `json:"finding"`
+		}
+		if err := enc.Encode(findingLine{Type: "finding", F: f}); err != nil {
+			return err
+		}
+	}
+	return nil
 }

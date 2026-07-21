@@ -304,7 +304,7 @@ func (c *Client) queryBatchOnce(ctx context.Context, queries []query) ([]result,
 		return nil, err
 	}
 	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(io.LimitReader(resp.Body, 16<<20)) // 16 MB cap
 	if err != nil {
 		return nil, err
 	}
@@ -403,7 +403,7 @@ func (c *Client) EnrichFromQuery(ctx context.Context, comp models.Component, mat
 		return err
 	}
 	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(io.LimitReader(resp.Body, 16<<20)) // 16 MB cap
 	if err != nil {
 		return err
 	}
@@ -475,7 +475,7 @@ func (c *Client) QueryPackageCatalog(ctx context.Context, name string) ([]models
 		return nil, err
 	}
 	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
+	data, err := io.ReadAll(io.LimitReader(resp.Body, 16<<20)) // 16 MB cap
 	if err != nil {
 		return nil, err
 	}

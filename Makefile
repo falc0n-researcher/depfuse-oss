@@ -1,4 +1,4 @@
-.PHONY: all build install test test-golden testdata fmt lint vet clean release docs docs-serve docs-clean-cache samples demo-gif
+.PHONY: all build install test test-golden testdata fmt lint vet clean release docs docs-serve docs-clean-cache samples demo-gif docker
 
 MODULE   := github.com/falc0n-researcher/depfuse-oss
 BINARY   := depfuse
@@ -87,6 +87,14 @@ demo-gif: build testdata
 
 clean:
 	rm -rf $(BIN_DIR)/ $(DIST_DIR)/ docs/_site docs/.jekyll-cache docs/.sass-cache
+
+docker:
+	docker build \
+		--build-arg VERSION=$(VERSION) \
+		--build-arg COMMIT=$(COMMIT) \
+		--build-arg DATE=$(DATE) \
+		-t depfuse:$(VERSION) \
+		-t depfuse:latest .
 
 release: clean
 	GOOS=darwin GOARCH=arm64 $(GO) build $(LDFLAGS) -o $(DIST_DIR)/$(BINARY)-darwin-arm64 $(CMD)

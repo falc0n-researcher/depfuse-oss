@@ -27,14 +27,26 @@ func Clone(repoURL, ref string) (string, error) {
 	}
 	owner, repo := m[1], m[2]
 
-	cacheRoot := filepath.Join(os.TempDir(), "depfuse-repos")
-	if err := os.MkdirAll(cacheRoot, 0o755); err != nil {
+	// Use a user-scoped cache (not shared /tmp) to prevent symlink attacks.
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("gitrepo: resolve home dir: %w", err)
+	}
+	cacheRoot := filepath.Join(home, ".depfuse", "repos")
+	if err := os.MkdirAll(cacheRoot, 0o700); err != nil {
 		return "", fmt.Errorf("gitrepo: create cache dir: %w", err)
 	}
 
 	dest := filepath.Join(cacheRoot, owner+"-"+repo)
-	if _, err := os.Stat(filepath.Join(dest, ".git")); err == nil {
-		return dest, nil
+
+	// Use Lstat to detect symlinks — refuse to reuse a symlinked cache entry.
+	gitDir := filepath.Join(dest, ".git")
+	if fi, err := os.Lstat(gitDir); err == nil {
+		if fi.Mode()&os.ModeSymlink != 0 {
+			_ = os.RemoveAll(dest)
+		} else {
+			return dest, nil
+		}
 	}
 
 	args := []string{"clone", "--depth", "1", repoURL, dest}
