@@ -162,7 +162,7 @@ func parseKEVZip(zipBytes []byte) ([]vcKEVEntry, error) {
 		if err != nil {
 			return nil, err
 		}
-		jsonData, err = io.ReadAll(rc)
+		jsonData, err = io.ReadAll(io.LimitReader(rc, 64<<20)) // 64 MB cap for extracted entry
 		rc.Close()
 		if err != nil {
 			return nil, err

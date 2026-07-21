@@ -15,7 +15,7 @@ type globalFlags struct {
 
 func bindGlobalFlags(root *cobra.Command) *globalFlags {
 	f := &globalFlags{}
-	root.PersistentFlags().StringVar(&f.format, "format", "cli", "Output: cli, json, html, or sarif")
+	root.PersistentFlags().StringVar(&f.format, "format", "cli", "Output: cli, json, jsonl, html, or sarif")
 	root.PersistentFlags().BoolVar(&f.quiet, "quiet", false, "Suppress progress output")
 	root.PersistentFlags().BoolVar(&f.verbose, "verbose", false, "Show evidence details and briefings")
 	return f

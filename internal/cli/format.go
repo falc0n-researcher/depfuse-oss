@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	formatsScan    = []string{"cli", "json", "html", "sarif"}
+	formatsScan    = []string{"cli", "json", "jsonl", "html", "sarif"}
 	formatsMemory  = []string{"cli", "json", "markdown", "md"}
 	formatsCollect = []string{"cli", "json"}
 )

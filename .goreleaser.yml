@@ -31,6 +31,50 @@ archives:
       - LICENSE
       - README.md
 
+dockers:
+  - image_templates:
+      - "ghcr.io/falc0n-researcher/depfuse:{{ .Version }}-amd64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title=depfuse"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source=https://github.com/falc0n-researcher/depfuse-oss"
+    goarch: amd64
+  - image_templates:
+      - "ghcr.io/falc0n-researcher/depfuse:{{ .Version }}-arm64"
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.title=depfuse"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/falc0n-researcher/depfuse:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/falc0n-researcher/depfuse:{{ .Version }}-amd64"
+      - "ghcr.io/falc0n-researcher/depfuse:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/falc0n-researcher/depfuse:latest"
+    image_templates:
+      - "ghcr.io/falc0n-researcher/depfuse:{{ .Version }}-amd64"
+      - "ghcr.io/falc0n-researcher/depfuse:{{ .Version }}-arm64"
+
+brews:
+  - name: depfuse
+    repository:
+      owner: falc0n-researcher
+      name: homebrew-tap
+    homepage: "https://github.com/falc0n-researcher/depfuse-oss"
+    description: "Exploit-evidence decisions for npm dependencies"
+    license: "MIT"
+    install: |
+      bin.install "depfuse"
+    test: |
+      system "#{bin}/depfuse", "--version"
+
 checksum:
   name_template: "checksums.txt"
 
