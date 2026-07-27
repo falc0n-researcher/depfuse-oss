@@ -141,7 +141,7 @@ func FetchWeeklyDownloads(ctx context.Context, names []string) (map[string]int64
 		return out, fmt.Errorf("npm downloads http %d", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20)) // 1 MB cap
 	if err != nil {
 		return out, err
 	}

@@ -1,0 +1,37 @@
+# Depfuse demo — scan a mounted project for weaponized dependencies
+#
+# Usage:
+#   docker compose run --rm scan            # scan current directory
+#   docker compose run --rm collect         # refresh intelligence feeds
+#   docker compose run --rm cve CVE-2025-29927
+#
+# Set DEPFUSE_VULNCHECK_TOKEN in .env for full feed collection.
+
+services:
+  depfuse:
+    build:
+      context: .
+      args:
+        VERSION: ${VERSION:-dev}
+    volumes:
+      - depfuse-data:/root/.depfuse
+      - .:/project:ro
+    working_dir: /project
+    environment:
+      - DEPFUSE_VULNCHECK_TOKEN=${DEPFUSE_VULNCHECK_TOKEN:-}
+      - DEPFUSE_NO_COLOR=${DEPFUSE_NO_COLOR:-}
+
+  scan:
+    extends: depfuse
+    entrypoint: ["/depfuse", "scan", "."]
+
+  collect:
+    extends: depfuse
+    entrypoint: ["/depfuse", "collect"]
+
+  cve:
+    extends: depfuse
+    entrypoint: ["/depfuse", "cve"]
+
+volumes:
+  depfuse-data:

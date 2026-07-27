@@ -1,0 +1,19 @@
+# ──────────────────────────────────────────────────────────────
+# Depfuse pre-commit hook
+# ──────────────────────────────────────────────────────────────
+# Add to your .pre-commit-config.yaml:
+#
+#   repos:
+#     - repo: https://github.com/falc0n-researcher/depfuse-oss
+#       rev: v1.0.0
+#       hooks:
+#         - id: depfuse-scan
+#
+- id: depfuse-scan
+  name: Depfuse — exploit-evidence dependency scan
+  entry: depfuse scan . --ci --fail-on P0,P1 --quiet --no-history
+  language: golang
+  additional_dependencies: ["github.com/falc0n-researcher/depfuse-oss/cmd/depfuse"]
+  files: "(package-lock\\.json|yarn\\.lock|pnpm-lock\\.yaml|bun\\.lock)$"
+  pass_filenames: false
+  always_run: false

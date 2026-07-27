@@ -1,0 +1,28 @@
+# ──────────────────────────────────────────────────────────────
+# Depfuse GitLab CI template
+# ──────────────────────────────────────────────────────────────
+# Include in your .gitlab-ci.yml:
+#
+#   include:
+#     - remote: 'https://raw.githubusercontent.com/falc0n-researcher/depfuse-oss/main/.gitlab-ci-template.yml'
+#
+# Or copy this file into your project.
+
+.depfuse-scan:
+  image: golang:1.25-alpine
+  stage: test
+  variables:
+    DEPFUSE_FAIL_ON: "P0,P1"
+  before_script:
+    - go install github.com/falc0n-researcher/depfuse-oss/cmd/depfuse@latest
+    - depfuse collect --quiet
+  script:
+    - depfuse scan . --ci --fail-on "${DEPFUSE_FAIL_ON}" --format json
+  rules:
+    - changes:
+        - package-lock.json
+        - yarn.lock
+        - pnpm-lock.yaml
+        - bun.lock
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  allow_failure: false

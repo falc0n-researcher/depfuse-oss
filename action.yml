@@ -1,0 +1,78 @@
+# ──────────────────────────────────────────────────────────────
+# Depfuse GitHub Action — reusable composite action
+# ──────────────────────────────────────────────────────────────
+# Usage in your workflow:
+#
+#   - uses: falc0n-researcher/depfuse-oss@v1
+#     with:
+#       fail-on: P0,P1
+#     env:
+#       DEPFUSE_VULNCHECK_TOKEN: ${{ secrets.VULNCHECK_TOKEN }}
+#
+name: "Depfuse — Exploit-Evidence Dependency Scan"
+description: "Scan npm dependencies for weaponized exposure with cited exploit evidence"
+branding:
+  icon: "shield"
+  color: "orange"
+
+inputs:
+  path:
+    description: "Path to the project root (default: .)"
+    required: false
+    default: "."
+  fail-on:
+    description: "Priority tiers that fail the job (default: P0,P1)"
+    required: false
+    default: "P0,P1"
+  format:
+    description: "Additional output format: json, sarif, html (default: sarif)"
+    required: false
+    default: "sarif"
+  go-version:
+    description: "Go version to install depfuse with"
+    required: false
+    default: "1.25.x"
+
+outputs:
+  exit-code:
+    description: "Depfuse exit code (0 = pass, 1 = fail)"
+    value: ${{ steps.scan.outputs.exit-code }}
+  sarif-path:
+    description: "Path to the SARIF file (if format includes sarif)"
+    value: ${{ steps.scan.outputs.sarif-path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+      with:
+        go-version: ${{ inputs.go-version }}
+        cache: false
+
+    - name: Install Depfuse
+      shell: bash
+      run: go install github.com/falc0n-researcher/depfuse-oss/cmd/depfuse@latest
+
+    - name: Collect intelligence
+      shell: bash
+      run: depfuse collect --quiet
+
+    - name: Run scan
+      id: scan
+      shell: bash
+      run: |
+        set +e
+        SARIF_DIR=$(mktemp -d)
+        depfuse scan "${{ inputs.path }}" \
+          --ci \
+          --fail-on "${{ inputs.fail-on }}" \
+          --format "${{ inputs.format }}" \
+          --out-dir "$SARIF_DIR"
+        CODE=$?
+        echo "exit-code=$CODE" >> "$GITHUB_OUTPUT"
+        if [ "${{ inputs.format }}" = "sarif" ]; then
+          SARIF_FILE=$(find "$SARIF_DIR" -name '*.sarif' -o -name '*.json' | head -1)
+          echo "sarif-path=$SARIF_FILE" >> "$GITHUB_OUTPUT"
+        fi
+        exit $CODE
